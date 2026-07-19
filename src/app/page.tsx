@@ -22,13 +22,13 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import OnlineInvitation from "@/components/online-invitation";
-import JavaneseInvitation from "@/components/javanese-invitation";
-import SilentPromiseInvitation from "@/components/silent-promise-invitation";
-import PalawaBloomInvitation from "@/components/palawa-bloom-invitation";
-import WhiteFreeInvitation from "@/components/white-free-invitation";
-import JavaneseV2Invitation from "@/components/javanese-v2-invitation";
-
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
+import { useToast } from "@/hooks/use-toast";
 import MusicPlayer from "@/components/music-player";
 import {
   Dialog,
@@ -37,1422 +37,15 @@ import {
 } from "@/components/ui/dialog";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 
-type TemplateType = "cetak" | "online";
-
-interface PageItem {
-  label: string;
-  src: string;
-}
-
-interface SpecItem {
-  label: string;
-  value: string;
-}
-
-interface Template {
-  id: number;
-  name: string;
-  category: string;
-  description: string;
-  size: string;
-  color: string;
-  pages: PageItem[];
-  specs?: SpecItem[];
-  link?: string;
-}
-
-const cetakTemplates: Template[] = [
-  // === CANTIK ===
-  {
-    id: 7, name: "CANTIK 81", category: "Cantik",
-    description: "Desain undangan cantik dengan tampilan elegan dan modern. Cocok untuk pernikahan yang berkesan indah dan berkelas.",
-    size: "13.5 x 21 cm", color: "Softcover BC 150G",
-    pages: [{ label: "Pembuka", src: "https://imglinkv-3.vercel.app/api/images/cmrjnd8tndx156xuo/file" }],
-    specs: [
-      { label: "Ukuran Lipat", value: "13.5cm x 21cm" },
-      { label: "Ukuran Terbuka", value: "21cm x 24cm" },
-      { label: "Plastik OPP", value: "14cm x 22cm" },
-      { label: "Jenis Kertas", value: "BC 150G" },
-      { label: "Jenis Blangko", value: "Softcover" },
-      { label: "Foil", value: "Tidak ada" },
-      { label: "Harga", value: "Rp 1.700/pcs" },
-      { label: "Pre Order", value: "3-7 Hari" },
-      { label: "Min Order", value: "50 Pcs" },
-      { label: "Note", value: "Sudah termasuk plastik OPP" },
-    ],
-  },
-  {
-    id: 8, name: "CANTIK 82", category: "Cantik",
-    description: "Desain undangan cantik dengan tampilan elegan dan modern. Cocok untuk pernikahan yang berkesan indah dan berkelas.",
-    size: "13.5 x 21 cm", color: "Softcover BC 150G",
-    pages: [{ label: "Pembuka", src: "https://imglinkv-3.vercel.app/api/images/cmrifxroc7ozi7m9n/file" }],
-    specs: [
-      { label: "Ukuran Lipat", value: "13.5cm x 21cm" },
-      { label: "Ukuran Terbuka", value: "21cm x 24cm" },
-      { label: "Plastik OPP", value: "14cm x 22cm" },
-      { label: "Jenis Kertas", value: "BC 150G" },
-      { label: "Jenis Blangko", value: "Softcover" },
-      { label: "Foil", value: "Tidak ada" },
-      { label: "Harga", value: "Rp 1.700/pcs" },
-      { label: "Pre Order", value: "3-7 Hari" },
-      { label: "Min Order", value: "50 Pcs" },
-      { label: "Note", value: "Sudah termasuk plastik OPP" },
-    ],
-  },
-  {
-    id: 9, name: "CANTIK 83", category: "Cantik",
-    description: "Desain undangan cantik dengan tampilan elegan dan modern. Cocok untuk pernikahan yang berkesan indah dan berkelas.",
-    size: "13.5 x 21 cm", color: "Softcover BC 150G",
-    pages: [{ label: "Pembuka", src: "https://imglinkv-3.vercel.app/api/images/cmrifxt9c2hmgjn97/file" }],
-    specs: [
-      { label: "Ukuran Lipat", value: "13.5cm x 21cm" },
-      { label: "Ukuran Terbuka", value: "21cm x 24cm" },
-      { label: "Plastik OPP", value: "14cm x 22cm" },
-      { label: "Jenis Kertas", value: "BC 150G" },
-      { label: "Jenis Blangko", value: "Softcover" },
-      { label: "Foil", value: "Tidak ada" },
-      { label: "Harga", value: "Rp 1.700/pcs" },
-      { label: "Pre Order", value: "3-7 Hari" },
-      { label: "Min Order", value: "50 Pcs" },
-      { label: "Note", value: "Sudah termasuk plastik OPP" },
-    ],
-  },
-  {
-    id: 10, name: "CANTIK 84", category: "Cantik",
-    description: "Desain undangan cantik dengan tampilan elegan dan modern. Cocok untuk pernikahan yang berkesan indah dan berkelas.",
-    size: "14.5 x 20.3 cm", color: "Softcover BC 150G",
-    pages: [{ label: "Pembuka", src: "https://imglinkv-3.vercel.app/api/images/cmrifxumq0ra8wqur/file" }],
-    specs: [
-      { label: "Ukuran Lipat", value: "14.5cm x 20.3cm" },
-      { label: "Ukuran Terbuka", value: "20.3cm x 29cm" },
-      { label: "Plastik OPP", value: "15cm x 22cm" },
-      { label: "Jenis Kertas", value: "BC 150G" },
-      { label: "Jenis Blangko", value: "Softcover" },
-      { label: "Foil", value: "Tidak ada" },
-      { label: "Harga", value: "Rp 1.700/pcs" },
-      { label: "Pre Order", value: "3-7 Hari" },
-      { label: "Min Order", value: "50 Pcs" },
-      { label: "Note", value: "Sudah termasuk plastik OPP" },
-    ],
-  },
-  {
-    id: 11, name: "CANTIK 85", category: "Cantik",
-    description: "Desain undangan cantik dengan tampilan elegan dan modern. Cocok untuk pernikahan yang berkesan indah dan berkelas.",
-    size: "13 x 19.8 cm", color: "Softcover BC 150G",
-    pages: [{ label: "Pembuka", src: "https://imglinkv-3.vercel.app/api/images/cmrifxvkud2ghxsi6/file" }],
-    specs: [
-      { label: "Ukuran Lipat", value: "13cm x 19.8cm" },
-      { label: "Ukuran Terbuka", value: "19.8cm x 29.3cm" },
-      { label: "Plastik OPP", value: "13.5cm x 22cm" },
-      { label: "Jenis Kertas", value: "BC 150G" },
-      { label: "Jenis Blangko", value: "Softcover" },
-      { label: "Foil", value: "Tidak ada" },
-      { label: "Harga", value: "Rp 1.700/pcs" },
-      { label: "Pre Order", value: "3-7 Hari" },
-      { label: "Min Order", value: "50 Pcs" },
-      { label: "Note", value: "Sudah termasuk plastik OPP" },
-    ],
-  },
-  {
-    id: 12, name: "CANTIK 86", category: "Cantik",
-    description: "Desain undangan cantik dengan tampilan elegan dan modern. Cocok untuk pernikahan yang berkesan indah dan berkelas.",
-    size: "13 x 19.8 cm", color: "Softcover BC 150G",
-    pages: [{ label: "Pembuka", src: "https://imglinkv-3.vercel.app/api/images/cmrifxx5gk2fikdlt/file" }],
-    specs: [
-      { label: "Ukuran Lipat", value: "13cm x 19.8cm" },
-      { label: "Ukuran Terbuka", value: "19.8cm x 29.3cm" },
-      { label: "Plastik OPP", value: "13.5cm x 22cm" },
-      { label: "Jenis Kertas", value: "BC 150G" },
-      { label: "Jenis Blangko", value: "Softcover" },
-      { label: "Foil", value: "Tidak ada" },
-      { label: "Harga", value: "Rp 1.700/pcs" },
-      { label: "Pre Order", value: "3-7 Hari" },
-      { label: "Min Order", value: "50 Pcs" },
-      { label: "Note", value: "Sudah termasuk plastik OPP" },
-    ],
-  },
-  {
-    id: 13, name: "CANTIK 94", category: "Cantik",
-    description: "Desain undangan cantik dengan tampilan elegan dan modern. Cocok untuk pernikahan yang berkesan indah dan berkelas.",
-    size: "11.6 x 19.5 cm", color: "Softcover BC 150G",
-    pages: [{ label: "Pembuka", src: "https://imglinkv-3.vercel.app/api/images/cmrjrsvskx95zbp63/file" }],
-    specs: [
-      { label: "Ukuran Lipat", value: "11.6cm x 19.5cm" },
-      { label: "Ukuran Terbuka", value: "19.5cm x 20.8cm" },
-      { label: "Plastik OPP", value: "12cm x 20cm" },
-      { label: "Jenis Kertas", value: "BC 150G" },
-      { label: "Jenis Blangko", value: "Softcover" },
-      { label: "Foil", value: "Tidak ada" },
-      { label: "Harga", value: "Rp 1.700/pcs" },
-      { label: "Pre Order", value: "3-7 Hari" },
-      { label: "Min Order", value: "50 Pcs" },
-      { label: "Note", value: "Sudah termasuk plastik OPP" },
-    ],
-  },
-  {
-    id: 14, name: "CANTIK 95", category: "Cantik",
-    description: "Desain undangan cantik dengan tampilan elegan dan modern. Cocok untuk pernikahan yang berkesan indah dan berkelas.",
-    size: "11.6 x 19.5 cm", color: "Softcover BC 150G",
-    pages: [{ label: "Pembuka", src: "https://imglinkv-3.vercel.app/api/images/cmrjrsxae3lajkaex/file" }],
-    specs: [
-      { label: "Ukuran Lipat", value: "11.6cm x 19.5cm" },
-      { label: "Ukuran Terbuka", value: "19.5cm x 20.8cm" },
-      { label: "Plastik OPP", value: "12cm x 20cm" },
-      { label: "Jenis Kertas", value: "BC 150G" },
-      { label: "Jenis Blangko", value: "Softcover" },
-      { label: "Foil", value: "Tidak ada" },
-      { label: "Harga", value: "Rp 1.700/pcs" },
-      { label: "Pre Order", value: "3-7 Hari" },
-      { label: "Min Order", value: "50 Pcs" },
-      { label: "Note", value: "Sudah termasuk plastik OPP" },
-    ],
-  },
-  {
-    id: 15, name: "CANTIK 96", category: "Cantik",
-    description: "Desain undangan cantik dengan tampilan elegan dan modern. Cocok untuk pernikahan yang berkesan indah dan berkelas.",
-    size: "11.6 x 19.5 cm", color: "Softcover BC 150G",
-    pages: [{ label: "Pembuka", src: "https://imglinkv-3.vercel.app/api/images/cmrjrsyp9gx6z6ps9/file" }],
-    specs: [
-      { label: "Ukuran Lipat", value: "11.6cm x 19.5cm" },
-      { label: "Ukuran Terbuka", value: "19.5cm x 20.8cm" },
-      { label: "Plastik OPP", value: "12cm x 20cm" },
-      { label: "Jenis Kertas", value: "BC 150G" },
-      { label: "Jenis Blangko", value: "Softcover" },
-      { label: "Foil", value: "Tidak ada" },
-      { label: "Harga", value: "Rp 1.700/pcs" },
-      { label: "Pre Order", value: "3-7 Hari" },
-      { label: "Min Order", value: "50 Pcs" },
-      { label: "Note", value: "Sudah termasuk plastik OPP" },
-    ],
-  },
-  {
-    id: 16, name: "CANTIK 97", category: "Cantik",
-    description: "Desain undangan cantik dengan tampilan elegan dan modern. Cocok untuk pernikahan yang berkesan indah dan berkelas.",
-    size: "11.6 x 19.5 cm", color: "Softcover BC 150G",
-    pages: [{ label: "Pembuka", src: "https://imglinkv-3.vercel.app/api/images/cmrjrt006mc23pppi/file" }],
-    specs: [
-      { label: "Ukuran Lipat", value: "11.6cm x 19.5cm" },
-      { label: "Ukuran Terbuka", value: "19.5cm x 20.8cm" },
-      { label: "Plastik OPP", value: "12cm x 20cm" },
-      { label: "Jenis Kertas", value: "BC 150G" },
-      { label: "Jenis Blangko", value: "Softcover" },
-      { label: "Foil", value: "Tidak ada" },
-      { label: "Harga", value: "Rp 1.700/pcs" },
-      { label: "Pre Order", value: "3-7 Hari" },
-      { label: "Min Order", value: "50 Pcs" },
-      { label: "Note", value: "Sudah termasuk plastik OPP" },
-    ],
-  },
-  {
-    id: 17, name: "CANTIK 98", category: "Cantik",
-    description: "Desain undangan cantik dengan tampilan elegan dan modern. Cocok untuk pernikahan yang berkesan indah dan berkelas.",
-    size: "12.2 x 20.7 cm", color: "Softcover BC 150G",
-    pages: [{ label: "Pembuka", src: "https://imglinkv-3.vercel.app/api/images/cmrjrt0tiom92475f/file" }],
-    specs: [
-      { label: "Ukuran Lipat", value: "12.2cm x 20.7cm" },
-      { label: "Ukuran Terbuka", value: "20.7cm x 23.9cm" },
-      { label: "Plastik OPP", value: "12.5cm x 22cm" },
-      { label: "Jenis Kertas", value: "BC 150G" },
-      { label: "Jenis Blangko", value: "Softcover" },
-      { label: "Foil", value: "Tidak ada" },
-      { label: "Harga", value: "Rp 1.700/pcs" },
-      { label: "Pre Order", value: "3-7 Hari" },
-      { label: "Min Order", value: "50 Pcs" },
-      { label: "Note", value: "Sudah termasuk plastik OPP" },
-    ],
-  },
-  {
-    id: 18, name: "CANTIK 99", category: "Cantik",
-    description: "Desain undangan cantik dengan tampilan elegan dan modern. Cocok untuk pernikahan yang berkesan indah dan berkelas.",
-    size: "12.2 x 20.7 cm", color: "Softcover BC 150G",
-    pages: [{ label: "Pembuka", src: "https://imglinkv-3.vercel.app/api/images/cmrjrt1rpjvtxhy3i/file" }],
-    specs: [
-      { label: "Ukuran Lipat", value: "12.2cm x 20.7cm" },
-      { label: "Ukuran Terbuka", value: "20.7cm x 23.9cm" },
-      { label: "Plastik OPP", value: "12.5cm x 22cm" },
-      { label: "Jenis Kertas", value: "BC 150G" },
-      { label: "Jenis Blangko", value: "Softcover" },
-      { label: "Foil", value: "Tidak ada" },
-      { label: "Harga", value: "Rp 1.700/pcs" },
-      { label: "Pre Order", value: "3-7 Hari" },
-      { label: "Min Order", value: "50 Pcs" },
-      { label: "Note", value: "Sudah termasuk plastik OPP" },
-    ],
-  },
-  {
-    id: 19, name: "CANTIK 100", category: "Cantik",
-    description: "Desain undangan cantik dengan tampilan elegan dan modern. Cocok untuk pernikahan yang berkesan indah dan berkelas.",
-    size: "11.5 x 19 cm", color: "Softcover BC 150G",
-    pages: [{ label: "Pembuka", src: "https://imglinkv-3.vercel.app/api/images/cmrjrt34ag7f92jcl/file" }],
-    specs: [
-      { label: "Ukuran Lipat", value: "11.5cm x 19cm" },
-      { label: "Ukuran Terbuka", value: "19cm x 20.3cm" },
-      { label: "Plastik OPP", value: "12.5cm x 22cm" },
-      { label: "Jenis Kertas", value: "BC 150G" },
-      { label: "Jenis Blangko", value: "Softcover" },
-      { label: "Foil", value: "Tidak ada" },
-      { label: "Harga", value: "Rp 1.700/pcs" },
-      { label: "Pre Order", value: "3-7 Hari" },
-      { label: "Min Order", value: "50 Pcs" },
-      { label: "Note", value: "Sudah termasuk plastik OPP" },
-    ],
-  },
-  {
-    id: 20, name: "CANTIK 101", category: "Cantik",
-    description: "Desain undangan cantik dengan tampilan elegan dan modern. Cocok untuk pernikahan yang berkesan indah dan berkelas.",
-    size: "11.5 x 19.5 cm", color: "Softcover BC 150G",
-    pages: [{ label: "Pembuka", src: "https://imglinkv-3.vercel.app/api/images/cmrjrt476ji0rutj2/file" }],
-    specs: [
-      { label: "Ukuran Lipat", value: "11.5cm x 19.5cm" },
-      { label: "Ukuran Terbuka", value: "19.5cm x 20.6cm" },
-      { label: "Plastik OPP", value: "12.5cm x 22cm" },
-      { label: "Jenis Kertas", value: "BC 150G" },
-      { label: "Jenis Blangko", value: "Softcover" },
-      { label: "Foil", value: "Tidak ada" },
-      { label: "Harga", value: "Rp 1.700/pcs" },
-      { label: "Pre Order", value: "3-7 Hari" },
-      { label: "Min Order", value: "50 Pcs" },
-      { label: "Note", value: "Sudah termasuk plastik OPP" },
-    ],
-  },
-  {
-    id: 21, name: "CANTIK 102", category: "Cantik",
-    description: "Desain undangan cantik dengan tampilan elegan dan modern. Cocok untuk pernikahan yang berkesan indah dan berkelas.",
-    size: "15.5 x 13.3 cm", color: "Softcover BC 150G",
-    pages: [{ label: "Pembuka", src: "https://imglinkv-3.vercel.app/api/images/cmrjrt7n71l75osrx/file" }],
-    specs: [
-      { label: "Ukuran Lipat", value: "15.5cm x 13.3cm" },
-      { label: "Ukuran Terbuka", value: "13.3cm x 28.8cm" },
-      { label: "Plastik OPP", value: "14cm x 18cm" },
-      { label: "Jenis Kertas", value: "BC 150G" },
-      { label: "Jenis Blangko", value: "Softcover" },
-      { label: "Foil", value: "Tidak ada" },
-      { label: "Harga", value: "Rp 1.700/pcs" },
-      { label: "Pre Order", value: "3-7 Hari" },
-      { label: "Min Order", value: "50 Pcs" },
-      { label: "Note", value: "Sudah termasuk plastik OPP" },
-    ],
-  },
-  {
-    id: 22, name: "CANTIK 103", category: "Cantik",
-    description: "Desain undangan cantik dengan tampilan elegan dan modern. Cocok untuk pernikahan yang berkesan indah dan berkelas.",
-    size: "13 x 18.5 cm", color: "Softcover BC 150G",
-    pages: [{ label: "Pembuka", src: "https://imglinkv-3.vercel.app/api/images/cmrjrt98xynt1kpx2/file" }],
-    specs: [
-      { label: "Ukuran Lipat", value: "13cm x 18.5cm" },
-      { label: "Ukuran Terbuka", value: "18.5cm x 26cm" },
-      { label: "Plastik OPP", value: "13.5cm x 22cm" },
-      { label: "Jenis Kertas", value: "BC 150G" },
-      { label: "Jenis Blangko", value: "Softcover" },
-      { label: "Foil", value: "Tidak ada" },
-      { label: "Harga", value: "Rp 1.700/pcs" },
-      { label: "Pre Order", value: "3-7 Hari" },
-      { label: "Min Order", value: "50 Pcs" },
-      { label: "Note", value: "Sudah termasuk plastik OPP" },
-    ],
-  },
-  {
-    id: 23, name: "CANTIK 104", category: "Cantik",
-    description: "Desain undangan cantik dengan tampilan elegan dan modern. Cocok untuk pernikahan yang berkesan indah dan berkelas.",
-    size: "14 x 15.2 cm", color: "Softcover BC 150G",
-    pages: [{ label: "Pembuka", src: "https://imglinkv-3.vercel.app/api/images/cmrjrtagcp4l5q212/file" }],
-    specs: [
-      { label: "Ukuran Lipat", value: "14cm x 15.2cm" },
-      { label: "Ukuran Terbuka", value: "15.2cm x 31cm" },
-      { label: "Plastik OPP", value: "14.5cm x 22cm" },
-      { label: "Jenis Kertas", value: "BC 150G" },
-      { label: "Jenis Blangko", value: "Softcover" },
-      { label: "Foil", value: "Tidak ada" },
-      { label: "Harga", value: "Rp 1.700/pcs" },
-      { label: "Pre Order", value: "3-7 Hari" },
-      { label: "Min Order", value: "50 Pcs" },
-      { label: "Note", value: "Sudah termasuk plastik OPP" },
-    ],
-  },
-  {
-    id: 24, name: "CANTIK 105", category: "Cantik",
-    description: "Desain undangan cantik dengan tampilan elegan dan modern. Cocok untuk pernikahan yang berkesan indah dan berkelas.",
-    size: "13 x 19.8 cm", color: "Softcover BC 150G",
-    pages: [{ label: "Pembuka", src: "https://imglinkv-3.vercel.app/api/images/cmrjrtbl25rqexp8y/file" }],
-    specs: [
-      { label: "Ukuran Lipat", value: "13cm x 19.8cm" },
-      { label: "Ukuran Terbuka", value: "19.8cm x 29cm" },
-      { label: "Plastik OPP", value: "13.5cm x 22cm" },
-      { label: "Jenis Kertas", value: "BC 150G" },
-      { label: "Jenis Blangko", value: "Softcover" },
-      { label: "Foil", value: "Tidak ada" },
-      { label: "Harga", value: "Rp 1.700/pcs" },
-      { label: "Pre Order", value: "3-7 Hari" },
-      { label: "Min Order", value: "50 Pcs" },
-      { label: "Note", value: "Sudah termasuk plastik OPP" },
-    ],
-  },
-  {
-    id: 25, name: "CANTIK 106", category: "Cantik",
-    description: "Desain undangan cantik dengan tampilan elegan dan modern. Cocok untuk pernikahan yang berkesan indah dan berkelas.",
-    size: "13 x 19.8 cm", color: "Softcover BC 150G",
-    pages: [{ label: "Pembuka", src: "https://imglinkv-3.vercel.app/api/images/cmrjrtcp80sag9y6m/file" }],
-    specs: [
-      { label: "Ukuran Lipat", value: "13cm x 19.8cm" },
-      { label: "Ukuran Terbuka", value: "19.8cm x 29cm" },
-      { label: "Plastik OPP", value: "13.5cm x 22cm" },
-      { label: "Jenis Kertas", value: "BC 150G" },
-      { label: "Jenis Blangko", value: "Softcover" },
-      { label: "Foil", value: "Tidak ada" },
-      { label: "Harga", value: "Rp 1.700/pcs" },
-      { label: "Pre Order", value: "3-7 Hari" },
-      { label: "Min Order", value: "50 Pcs" },
-      { label: "Note", value: "Sudah termasuk plastik OPP" },
-    ],
-  },
-  {
-    id: 26, name: "CANTIK 107", category: "Cantik",
-    description: "Desain undangan cantik dengan tampilan elegan dan modern. Cocok untuk pernikahan yang berkesan indah dan berkelas.",
-    size: "13 x 19.8 cm", color: "Softcover BC 150G",
-    pages: [{ label: "Pembuka", src: "https://imglinkv-3.vercel.app/api/images/cmrjrtdlvu1gbdvii/file" }],
-    specs: [
-      { label: "Ukuran Lipat", value: "13cm x 19.8cm" },
-      { label: "Ukuran Terbuka", value: "19.8cm x 29cm" },
-      { label: "Plastik OPP", value: "13.5cm x 22cm" },
-      { label: "Jenis Kertas", value: "BC 150G" },
-      { label: "Jenis Blangko", value: "Softcover" },
-      { label: "Foil", value: "Tidak ada" },
-      { label: "Harga", value: "Rp 1.700/pcs" },
-      { label: "Pre Order", value: "3-7 Hari" },
-      { label: "Min Order", value: "50 Pcs" },
-      { label: "Note", value: "Sudah termasuk plastik OPP" },
-    ],
-  },
-  // === HEPI ===
-  {
-    id: 27, name: "HEPI 26.036", category: "Hepi",
-    description: "Template undangan modern dan ceria dengan desain colorful. Pilihan tepat untuk pernikahan yang menyenangkan.",
-    size: "13.4 x 20 cm", color: "Softcover BC 150G",
-    pages: [{ label: "Pembuka", src: "https://imglinkv-3.vercel.app/api/images/cmrifyqihy56la0jl/file" }],
-    specs: [
-      { label: "Ukuran Lipat", value: "13.4cm x 20cm" },
-      { label: "Ukuran Terbuka", value: "20cm x 29.5cm" },
-      { label: "Plastik OPP", value: "14cm x 22cm" },
-      { label: "Jenis Kertas", value: "BC 150G" },
-      { label: "Jenis Blangko", value: "Softcover" },
-      { label: "Foil", value: "Tidak ada" },
-      { label: "Harga", value: "Rp 1.700/pcs" },
-      { label: "Pre Order", value: "3-7 Hari" },
-      { label: "Min Order", value: "50 Pcs" },
-      { label: "Note", value: "Sudah termasuk plastik OPP" },
-    ],
-  },
-  {
-    id: 28, name: "HEPI 26.037", category: "Hepi",
-    description: "Template undangan modern dan ceria dengan desain colorful. Pilihan tepat untuk pernikahan yang menyenangkan.",
-    size: "11 x 20 cm", color: "Softcover BC 150G",
-    pages: [{ label: "Pembuka", src: "https://imglinkv-3.vercel.app/api/images/cmrifys8hdet3lg4p/file" }],
-    specs: [
-      { label: "Ukuran Lipat", value: "11cm x 20cm" },
-      { label: "Ukuran Terbuka", value: "20cm x 20.3cm" },
-      { label: "Plastik OPP", value: "11.5cm x 22cm" },
-      { label: "Jenis Kertas", value: "BC 150G" },
-      { label: "Jenis Blangko", value: "Softcover" },
-      { label: "Foil", value: "Tidak ada" },
-      { label: "Harga", value: "Rp 1.700/pcs" },
-      { label: "Pre Order", value: "3-7 Hari" },
-      { label: "Min Order", value: "50 Pcs" },
-      { label: "Note", value: "Sudah termasuk plastik OPP" },
-    ],
-  },
-  {
-    id: 29, name: "HEPI 26.038", category: "Hepi",
-    description: "Template undangan modern dan ceria dengan desain colorful. Pilihan tepat untuk pernikahan yang menyenangkan.",
-    size: "16 x 13.4 cm", color: "Softcover BC 150G",
-    pages: [{ label: "Pembuka", src: "https://imglinkv-3.vercel.app/api/images/cmrifyte46233hjz6/file" }],
-    specs: [
-      { label: "Ukuran Lipat", value: "16cm x 13.4cm" },
-      { label: "Ukuran Terbuka", value: "13.4cm x 29.5cm" },
-      { label: "Plastik OPP", value: "14cm x 22cm" },
-      { label: "Jenis Kertas", value: "BC 150G" },
-      { label: "Jenis Blangko", value: "Softcover" },
-      { label: "Foil", value: "Tidak ada" },
-      { label: "Harga", value: "Rp 1.700/pcs" },
-      { label: "Pre Order", value: "3-7 Hari" },
-      { label: "Min Order", value: "50 Pcs" },
-      { label: "Note", value: "Sudah termasuk plastik OPP" },
-    ],
-  },
-  {
-    id: 30, name: "HEPI 26.039", category: "Hepi",
-    description: "Template undangan modern dan ceria dengan desain colorful. Pilihan tepat untuk pernikahan yang menyenangkan.",
-    size: "13 x 20 cm", color: "Softcover BC 150G",
-    pages: [{ label: "Pembuka", src: "https://imglinkv-3.vercel.app/api/images/cmrifyu7ovmdcwleh/file" }],
-    specs: [
-      { label: "Ukuran Lipat", value: "13cm x 20cm" },
-      { label: "Ukuran Terbuka", value: "20cm x 30cm" },
-      { label: "Plastik OPP", value: "14cm x 22cm" },
-      { label: "Jenis Kertas", value: "BC 150G" },
-      { label: "Jenis Blangko", value: "Softcover" },
-      { label: "Foil", value: "Tidak ada" },
-      { label: "Harga", value: "Rp 1.700/pcs" },
-      { label: "Pre Order", value: "3-7 Hari" },
-      { label: "Min Order", value: "50 Pcs" },
-      { label: "Note", value: "Sudah termasuk plastik OPP" },
-    ],
-  },
-  {
-    id: 31, name: "HEPI 26.040", category: "Hepi",
-    description: "Template undangan modern dan ceria dengan desain colorful. Pilihan tepat untuk pernikahan yang menyenangkan.",
-    size: "13 x 20 cm", color: "Softcover BC 150G",
-    pages: [{ label: "Pembuka", src: "https://imglinkv-3.vercel.app/api/images/cmrifyvhdw43kqnk5/file" }],
-    specs: [
-      { label: "Ukuran Lipat", value: "13cm x 20cm" },
-      { label: "Ukuran Terbuka", value: "20cm x 30cm" },
-      { label: "Plastik OPP", value: "14cm x 22cm" },
-      { label: "Jenis Kertas", value: "BC 150G" },
-      { label: "Jenis Blangko", value: "Softcover" },
-      { label: "Foil", value: "Tidak ada" },
-      { label: "Harga", value: "Rp 1.700/pcs" },
-      { label: "Pre Order", value: "3-7 Hari" },
-      { label: "Min Order", value: "50 Pcs" },
-      { label: "Note", value: "Sudah termasuk plastik OPP" },
-    ],
-  },
-  // === MALIQ ===
-  {
-    id: 32, name: "MQ 108", category: "Maliq",
-    description: "Desain undangan mewah dengan sentuhan premium. Elegan dan berkelas untuk pernikahan impian Anda.",
-    size: "15.8 x 13.5 cm", color: "Softcover BC 150G",
-    pages: [{ label: "Pembuka", src: "https://imglinkv-3.vercel.app/api/images/cmrig02onlapunw4z/file" }],
-    specs: [
-      { label: "Ukuran Lipat", value: "15.8cm x 13.5cm" },
-      { label: "Ukuran Terbuka", value: "13.5cm x 29cm" },
-      { label: "Plastik OPP", value: "14cm x 22cm" },
-      { label: "Jenis Kertas", value: "BC 150G" },
-      { label: "Jenis Blangko", value: "Softcover" },
-      { label: "Foil", value: "Tidak ada" },
-      { label: "Harga", value: "Rp 1.600/pcs" },
-      { label: "Pre Order", value: "3-7 Hari" },
-      { label: "Min Order", value: "50 Pcs" },
-      { label: "Note", value: "Sudah termasuk plastik OPP" },
-    ],
-  },
-  {
-    id: 33, name: "MQ 109", category: "Maliq",
-    description: "Desain undangan mewah dengan sentuhan premium. Elegan dan berkelas untuk pernikahan impian Anda.",
-    size: "15.8 x 13.5 cm", color: "Softcover BC 150G",
-    pages: [{ label: "Pembuka", src: "https://imglinkv-3.vercel.app/api/images/cmrig048dcj4lqa7q/file" }],
-    specs: [
-      { label: "Ukuran Lipat", value: "15.8cm x 13.5cm" },
-      { label: "Ukuran Terbuka", value: "13.5cm x 29cm" },
-      { label: "Plastik OPP", value: "14cm x 22cm" },
-      { label: "Jenis Kertas", value: "BC 150G" },
-      { label: "Jenis Blangko", value: "Softcover" },
-      { label: "Foil", value: "Tidak ada" },
-      { label: "Harga", value: "Rp 1.600/pcs" },
-      { label: "Pre Order", value: "3-7 Hari" },
-      { label: "Min Order", value: "50 Pcs" },
-      { label: "Note", value: "Sudah termasuk plastik OPP" },
-    ],
-  },
-  {
-    id: 34, name: "MQ 110", category: "Maliq",
-    description: "Desain undangan mewah dengan sentuhan premium. Elegan dan berkelas untuk pernikahan impian Anda.",
-    size: "13.6 x 20 cm", color: "Softcover BC 150G",
-    pages: [{ label: "Pembuka", src: "https://imglinkv-3.vercel.app/api/images/cmrig05ddc22w89bi/file" }],
-    specs: [
-      { label: "Ukuran Lipat", value: "13.6cm x 20cm" },
-      { label: "Ukuran Terbuka", value: "20cm x 29.8cm" },
-      { label: "Plastik OPP", value: "14cm x 22cm" },
-      { label: "Jenis Kertas", value: "BC 150G" },
-      { label: "Jenis Blangko", value: "Softcover" },
-      { label: "Foil", value: "Tidak ada" },
-      { label: "Harga", value: "Rp 1.700/pcs" },
-      { label: "Pre Order", value: "3-7 Hari" },
-      { label: "Min Order", value: "50 Pcs" },
-      { label: "Note", value: "Sudah termasuk plastik OPP" },
-    ],
-  },
-  {
-    id: 35, name: "MQ 111", category: "Maliq",
-    description: "Desain undangan mewah dengan sentuhan premium. Elegan dan berkelas untuk pernikahan impian Anda.",
-    size: "14 x 20.3 cm", color: "Softcover BC 150G",
-    pages: [{ label: "Pembuka", src: "https://imglinkv-3.vercel.app/api/images/cmrig06hudq8xcahl/file" }],
-    specs: [
-      { label: "Ukuran Lipat", value: "14cm x 20.3cm" },
-      { label: "Ukuran Terbuka", value: "20.3cm x 29cm" },
-      { label: "Plastik OPP", value: "14.5cm x 22cm" },
-      { label: "Jenis Kertas", value: "BC 150G" },
-      { label: "Jenis Blangko", value: "Softcover" },
-      { label: "Foil", value: "Tidak ada" },
-      { label: "Harga", value: "Rp 1.700/pcs" },
-      { label: "Pre Order", value: "3-7 Hari" },
-      { label: "Min Order", value: "50 Pcs" },
-      { label: "Note", value: "Sudah termasuk plastik OPP" },
-    ],
-  },
-  {
-    id: 36, name: "MQ 112", category: "Maliq",
-    description: "Desain undangan mewah dengan sentuhan premium. Elegan dan berkelas untuk pernikahan impian Anda.",
-    size: "14 x 20.3 cm", color: "Softcover BC 150G",
-    pages: [{ label: "Pembuka", src: "https://imglinkv-3.vercel.app/api/images/cmrig07bdqjny8a3y/file" }],
-    specs: [
-      { label: "Ukuran Lipat", value: "14cm x 20.3cm" },
-      { label: "Ukuran Terbuka", value: "20.3cm x 29cm" },
-      { label: "Plastik OPP", value: "14.5cm x 22cm" },
-      { label: "Jenis Kertas", value: "BC 150G" },
-      { label: "Jenis Blangko", value: "Softcover" },
-      { label: "Foil", value: "Tidak ada" },
-      { label: "Harga", value: "Rp 1.700/pcs" },
-      { label: "Pre Order", value: "3-7 Hari" },
-      { label: "Min Order", value: "50 Pcs" },
-      { label: "Note", value: "Sudah termasuk plastik OPP" },
-    ],
-  },
-  // === LINTANG ===
-  {
-    id: 40, name: "LG 104", category: "Lintang",
-    description: "Template undangan eksklusif format square. Desain unik dan modern untuk hari spesial Anda.",
-    size: "11.2 x 19 cm", color: "Softcover BC 150G",
-    pages: [{ label: "Pembuka", src: "https://imglinkv-3.vercel.app/api/images/cmrifzk6z6kyuosqk/file" }],
-    specs: [
-      { label: "Ukuran Lipat", value: "11.2cm x 19cm" },
-      { label: "Ukuran Terbuka", value: "19cm x 20.3cm" },
-      { label: "Plastik OPP", value: "12cm x 22cm" },
-      { label: "Jenis Kertas", value: "BC 150G" },
-      { label: "Jenis Blangko", value: "Softcover" },
-      { label: "Foil", value: "Tidak ada" },
-      { label: "Harga", value: "Rp 1.650/pcs" },
-      { label: "Pre Order", value: "3-7 Hari" },
-      { label: "Min Order", value: "50 Pcs" },
-      { label: "Note", value: "Sudah termasuk plastik OPP" },
-    ],
-  },
-  {
-    id: 41, name: "LG 105", category: "Lintang",
-    description: "Template undangan eksklusif format square. Desain unik dan modern untuk hari spesial Anda.",
-    size: "11.2 x 19 cm", color: "Softcover BC 150G",
-    pages: [{ label: "Pembuka", src: "https://imglinkv-3.vercel.app/api/images/cmrifzlpp3dedmi6b/file" }],
-    specs: [
-      { label: "Ukuran Lipat", value: "11.2cm x 19cm" },
-      { label: "Ukuran Terbuka", value: "19cm x 20.3cm" },
-      { label: "Plastik OPP", value: "12cm x 22cm" },
-      { label: "Jenis Kertas", value: "BC 150G" },
-      { label: "Jenis Blangko", value: "Softcover" },
-      { label: "Foil", value: "Tidak ada" },
-      { label: "Harga", value: "Rp 1.650/pcs" },
-      { label: "Pre Order", value: "3-7 Hari" },
-      { label: "Min Order", value: "50 Pcs" },
-      { label: "Note", value: "Sudah termasuk plastik OPP" },
-    ],
-  },
-  {
-    id: 42, name: "LG 106", category: "Lintang",
-    description: "Template undangan eksklusif format square. Desain unik dan modern untuk hari spesial Anda.",
-    size: "11.2 x 19 cm", color: "Softcover BC 150G",
-    pages: [{ label: "Pembuka", src: "https://imglinkv-3.vercel.app/api/images/cmrifzmplictwwh0t/file" }],
-    specs: [
-      { label: "Ukuran Lipat", value: "11.2cm x 19cm" },
-      { label: "Ukuran Terbuka", value: "19cm x 20.3cm" },
-      { label: "Plastik OPP", value: "12cm x 22cm" },
-      { label: "Jenis Kertas", value: "BC 150G" },
-      { label: "Jenis Blangko", value: "Softcover" },
-      { label: "Foil", value: "Tidak ada" },
-      { label: "Harga", value: "Rp 1.650/pcs" },
-      { label: "Pre Order", value: "3-7 Hari" },
-      { label: "Min Order", value: "50 Pcs" },
-      { label: "Note", value: "Sudah termasuk plastik OPP" },
-    ],
-  },
-  {
-    id: 43, name: "LG 107", category: "Lintang",
-    description: "Template undangan eksklusif format square. Desain unik dan modern untuk hari spesial Anda.",
-    size: "11.2 x 19 cm", color: "Softcover BC 150G",
-    pages: [{ label: "Pembuka", src: "https://imglinkv-3.vercel.app/api/images/cmrifznmtfl05tzb1/file" }],
-    specs: [
-      { label: "Ukuran Lipat", value: "11.2cm x 19cm" },
-      { label: "Ukuran Terbuka", value: "19cm x 20.3cm" },
-      { label: "Plastik OPP", value: "12cm x 22cm" },
-      { label: "Jenis Kertas", value: "BC 150G" },
-      { label: "Jenis Blangko", value: "Softcover" },
-      { label: "Foil", value: "Tidak ada" },
-      { label: "Harga", value: "Rp 1.650/pcs" },
-      { label: "Pre Order", value: "3-7 Hari" },
-      { label: "Min Order", value: "50 Pcs" },
-      { label: "Note", value: "Sudah termasuk plastik OPP" },
-    ],
-  },
-  {
-    id: 44, name: "LG 108", category: "Lintang",
-    description: "Template undangan eksklusif format square. Desain unik dan modern untuk hari spesial Anda.",
-    size: "11.2 x 19 cm", color: "Softcover BC 150G",
-    pages: [{ label: "Pembuka", src: "https://imglinkv-3.vercel.app/api/images/cmrifzoxb4o88gqwj/file" }],
-    specs: [
-      { label: "Ukuran Lipat", value: "11.2cm x 19cm" },
-      { label: "Ukuran Terbuka", value: "19cm x 20.3cm" },
-      { label: "Plastik OPP", value: "12cm x 22cm" },
-      { label: "Jenis Kertas", value: "BC 150G" },
-      { label: "Jenis Blangko", value: "Softcover" },
-      { label: "Foil", value: "Tidak ada" },
-      { label: "Harga", value: "Rp 1.650/pcs" },
-      { label: "Pre Order", value: "3-7 Hari" },
-      { label: "Min Order", value: "50 Pcs" },
-      { label: "Note", value: "Sudah termasuk plastik OPP" },
-    ],
-  },
-  {
-    id: 45, name: "LG 109", category: "Lintang",
-    description: "Template undangan eksklusif format square. Desain unik dan modern untuk hari spesial Anda.",
-    size: "13 x 18.5 cm", color: "Softcover BC 150G",
-    pages: [{ label: "Pembuka", src: "https://imglinkv-3.vercel.app/api/images/cmrifzq1v95a5byoj/file" }],
-    specs: [
-      { label: "Ukuran Lipat", value: "13cm x 18.5cm" },
-      { label: "Ukuran Terbuka", value: "18.5cm x 26cm" },
-      { label: "Plastik OPP", value: "13.5cm x 22cm" },
-      { label: "Jenis Kertas", value: "BC 150G" },
-      { label: "Jenis Blangko", value: "Softcover" },
-      { label: "Foil", value: "Tidak ada" },
-      { label: "Harga", value: "Rp 1.650/pcs" },
-      { label: "Pre Order", value: "3-7 Hari" },
-      { label: "Min Order", value: "50 Pcs" },
-      { label: "Note", value: "Sudah termasuk plastik OPP" },
-    ],
-  },
-  {
-    id: 46, name: "LG 110", category: "Lintang",
-    description: "Template undangan eksklusif format square. Desain unik dan modern untuk hari spesial Anda.",
-    size: "13 x 18.5 cm", color: "Softcover BC 150G",
-    pages: [{ label: "Pembuka", src: "https://imglinkv-3.vercel.app/api/images/cmrifzr9kiif6pecn/file" }],
-    specs: [
-      { label: "Ukuran Lipat", value: "13cm x 18.5cm" },
-      { label: "Ukuran Terbuka", value: "18.5cm x 26cm" },
-      { label: "Plastik OPP", value: "13.5cm x 22cm" },
-      { label: "Jenis Kertas", value: "BC 150G" },
-      { label: "Jenis Blangko", value: "Softcover" },
-      { label: "Foil", value: "Tidak ada" },
-      { label: "Harga", value: "Rp 1.650/pcs" },
-      { label: "Pre Order", value: "3-7 Hari" },
-      { label: "Min Order", value: "50 Pcs" },
-      { label: "Note", value: "Sudah termasuk plastik OPP" },
-    ],
-  },
-  {
-    id: 47, name: "LG 111", category: "Lintang",
-    description: "Template undangan eksklusif format square. Desain unik dan modern untuk hari spesial Anda.",
-    size: "14 x 13.5 cm", color: "Softcover BC 150G",
-    pages: [{ label: "Pembuka", src: "https://imglinkv-3.vercel.app/api/images/cmrifzs6beal6bh1j/file" }],
-    specs: [
-      { label: "Ukuran Lipat", value: "14cm x 13.5cm" },
-      { label: "Ukuran Terbuka", value: "13.5cm x 29cm" },
-      { label: "Plastik OPP", value: "14cm x 20cm" },
-      { label: "Jenis Kertas", value: "BC 150G" },
-      { label: "Jenis Blangko", value: "Softcover" },
-      { label: "Foil", value: "Tidak ada" },
-      { label: "Harga", value: "Rp 1.650/pcs" },
-      { label: "Pre Order", value: "3-7 Hari" },
-      { label: "Min Order", value: "50 Pcs" },
-      { label: "Note", value: "Sudah termasuk plastik OPP" },
-    ],
-  },
-  {
-    id: 48, name: "LG 112", category: "Lintang",
-    description: "Template undangan eksklusif format square. Desain unik dan modern untuk hari spesial Anda.",
-    size: "16 x 13.5 cm", color: "Softcover BC 150G",
-    pages: [{ label: "Pembuka", src: "https://imglinkv-3.vercel.app/api/images/cmrifztfjr2hwa342/file" }],
-    specs: [
-      { label: "Ukuran Lipat", value: "16cm x 13.5cm" },
-      { label: "Ukuran Terbuka", value: "13.5cm x 29cm" },
-      { label: "Plastik OPP", value: "14cm x 20cm" },
-      { label: "Jenis Kertas", value: "BC 150G" },
-      { label: "Jenis Blangko", value: "Softcover" },
-      { label: "Foil", value: "Tidak ada" },
-      { label: "Harga", value: "Rp 1.650/pcs" },
-      { label: "Pre Order", value: "3-7 Hari" },
-      { label: "Min Order", value: "50 Pcs" },
-      { label: "Note", value: "Sudah termasuk plastik OPP" },
-    ],
-  },
-  {
-    id: 49, name: "LG 113", category: "Lintang",
-    description: "Template undangan eksklusif format square. Desain unik dan modern untuk hari spesial Anda.",
-    size: "16 x 13.5 cm", color: "Softcover BC 150G",
-    pages: [{ label: "Pembuka", src: "https://imglinkv-3.vercel.app/api/images/cmrifzuohtxaleeeo/file" }],
-    specs: [
-      { label: "Ukuran Lipat", value: "16cm x 13.5cm" },
-      { label: "Ukuran Terbuka", value: "13.5cm x 29cm" },
-      { label: "Plastik OPP", value: "14cm x 20cm" },
-      { label: "Jenis Kertas", value: "BC 150G" },
-      { label: "Jenis Blangko", value: "Softcover" },
-      { label: "Foil", value: "Tidak ada" },
-      { label: "Harga", value: "Rp 1.650/pcs" },
-      { label: "Pre Order", value: "3-7 Hari" },
-      { label: "Min Order", value: "50 Pcs" },
-      { label: "Note", value: "Sudah termasuk plastik OPP" },
-    ],
-  },
-  {
-    id: 50, name: "LG 114", category: "Lintang",
-    description: "Template undangan eksklusif format square. Desain unik dan modern untuk hari spesial Anda.",
-    size: "16 x 13.5 cm", color: "Softcover BC 150G",
-    pages: [{ label: "Pembuka", src: "https://imglinkv-3.vercel.app/api/images/cmrifzvlvheu95o0t/file" }],
-    specs: [
-      { label: "Ukuran Lipat", value: "16cm x 13.5cm" },
-      { label: "Ukuran Terbuka", value: "13.5cm x 29cm" },
-      { label: "Plastik OPP", value: "14cm x 20cm" },
-      { label: "Jenis Kertas", value: "BC 150G" },
-      { label: "Jenis Blangko", value: "Softcover" },
-      { label: "Foil", value: "Tidak ada" },
-      { label: "Harga", value: "Rp 1.650/pcs" },
-      { label: "Pre Order", value: "3-7 Hari" },
-      { label: "Min Order", value: "50 Pcs" },
-      { label: "Note", value: "Sudah termasuk plastik OPP" },
-    ],
-  },
-  {
-    id: 51, name: "LG 115", category: "Lintang",
-    description: "Template undangan eksklusif format square. Desain unik dan modern untuk hari spesial Anda.",
-    size: "16 x 13.5 cm", color: "Softcover BC 150G",
-    pages: [{ label: "Pembuka", src: "https://imglinkv-3.vercel.app/api/images/cmrifzwuyaiyrxam7/file" }],
-    specs: [
-      { label: "Ukuran Lipat", value: "16cm x 13.5cm" },
-      { label: "Ukuran Terbuka", value: "13.5cm x 29cm" },
-      { label: "Plastik OPP", value: "14cm x 20cm" },
-      { label: "Jenis Kertas", value: "BC 150G" },
-      { label: "Jenis Blangko", value: "Softcover" },
-      { label: "Foil", value: "Tidak ada" },
-      { label: "Harga", value: "Rp 1.650/pcs" },
-      { label: "Pre Order", value: "3-7 Hari" },
-      { label: "Min Order", value: "50 Pcs" },
-      { label: "Note", value: "Sudah termasuk plastik OPP" },
-    ],
-  },
-  // === RAYYA ===
-  {
-    id: 52, name: "RAYYA 376", category: "Rayya",
-    description: "Desain undangan anggun dengan sentuhan floral. Cocok untuk pernikahan dengan tema romantis.",
-    size: "12.5 x 21 cm", color: "Softcover BC 150G",
-    pages: [{ label: "Pembuka", src: "https://imglinkv-3.vercel.app/api/images/cmrig0fdqcqivcdvl/file" }],
-    specs: [
-      { label: "Ukuran Lipat", value: "12.5cm x 21cm" },
-      { label: "Ukuran Terbuka", value: "21cm x 23.7cm" },
-      { label: "Plastik OPP", value: "13cm x 22cm" },
-      { label: "Jenis Kertas", value: "BC 150G" },
-      { label: "Jenis Blangko", value: "Softcover" },
-      { label: "Foil", value: "Tidak ada" },
-      { label: "Harga", value: "Rp 1.700/pcs" },
-      { label: "Pre Order", value: "3-7 Hari" },
-      { label: "Min Order", value: "50 Pcs" },
-      { label: "Note", value: "Sudah termasuk plastik OPP" },
-    ],
-  },
-  {
-    id: 53, name: "RAYYA 377", category: "Rayya",
-    description: "Desain undangan anggun dengan sentuhan floral. Cocok untuk pernikahan dengan tema romantis.",
-    size: "12.5 x 21 cm", color: "Softcover BC 150G",
-    pages: [{ label: "Pembuka", src: "https://imglinkv-3.vercel.app/api/images/cmrig0gqzxtnopb4g/file" }],
-    specs: [
-      { label: "Ukuran Lipat", value: "12.5cm x 21cm" },
-      { label: "Ukuran Terbuka", value: "21cm x 23.7cm" },
-      { label: "Plastik OPP", value: "13cm x 22cm" },
-      { label: "Jenis Kertas", value: "BC 150G" },
-      { label: "Jenis Blangko", value: "Softcover" },
-      { label: "Foil", value: "Tidak ada" },
-      { label: "Harga", value: "Rp 1.700/pcs" },
-      { label: "Pre Order", value: "3-7 Hari" },
-      { label: "Min Order", value: "50 Pcs" },
-      { label: "Note", value: "Sudah termasuk plastik OPP" },
-    ],
-  },
-  {
-    id: 54, name: "RAYYA 378", category: "Rayya",
-    description: "Desain undangan anggun dengan sentuhan floral. Cocok untuk pernikahan dengan tema romantis.",
-    size: "13.5 x 19 cm", color: "Softcover BC 150G",
-    pages: [{ label: "Pembuka", src: "https://imglinkv-3.vercel.app/api/images/cmrig0i6422695f2b/file" }],
-    specs: [
-      { label: "Ukuran Lipat", value: "13.5cm x 19cm" },
-      { label: "Ukuran Terbuka", value: "19cm x 20.3cm" },
-      { label: "Plastik OPP", value: "14cm x 22cm" },
-      { label: "Jenis Kertas", value: "BC 150G" },
-      { label: "Jenis Blangko", value: "Softcover" },
-      { label: "Foil", value: "Tidak ada" },
-      { label: "Harga", value: "Rp 1.700/pcs" },
-      { label: "Pre Order", value: "3-7 Hari" },
-      { label: "Min Order", value: "50 Pcs" },
-      { label: "Note", value: "Sudah termasuk plastik OPP" },
-    ],
-  },
-  {
-    id: 55, name: "RAYYA 379", category: "Rayya",
-    description: "Desain undangan anggun dengan sentuhan floral. Cocok untuk pernikahan dengan tema romantis.",
-    size: "13.5 x 19 cm", color: "Softcover BC 150G",
-    pages: [{ label: "Pembuka", src: "https://imglinkv-3.vercel.app/api/images/cmrig0jewyy4pg80s/file" }],
-    specs: [
-      { label: "Ukuran Lipat", value: "13.5cm x 19cm" },
-      { label: "Ukuran Terbuka", value: "19cm x 20.3cm" },
-      { label: "Plastik OPP", value: "14cm x 22cm" },
-      { label: "Jenis Kertas", value: "BC 150G" },
-      { label: "Jenis Blangko", value: "Softcover" },
-      { label: "Foil", value: "Tidak ada" },
-      { label: "Harga", value: "Rp 1.700/pcs" },
-      { label: "Pre Order", value: "3-7 Hari" },
-      { label: "Min Order", value: "50 Pcs" },
-      { label: "Note", value: "Sudah termasuk plastik OPP" },
-    ],
-  },
-  // === RIZKI ===
-  {
-    id: 56, name: "RIZKI 57", category: "Rizki",
-    description: "Template undangan cantik dengan desain timeless. Elegan dan cocok untuk berbagai tema pernikahan.",
-    size: "11.2 x 19 cm", color: "Softcover BC 150G",
-    pages: [{ label: "Pembuka", src: "https://imglinkv-3.vercel.app/api/images/cmrig0rhznzmpgrz5/file" }],
-    specs: [
-      { label: "Ukuran Lipat", value: "11.2cm x 19cm" },
-      { label: "Ukuran Terbuka", value: "19cm x 20.3cm" },
-      { label: "Plastik OPP", value: "12cm x 22cm" },
-      { label: "Jenis Kertas", value: "BC 150G" },
-      { label: "Jenis Blangko", value: "Softcover" },
-      { label: "Foil", value: "Tidak ada" },
-      { label: "Harga", value: "Rp 1.600/pcs" },
-      { label: "Pre Order", value: "3-7 Hari" },
-      { label: "Min Order", value: "50 Pcs" },
-      { label: "Note", value: "Sudah termasuk plastik OPP" },
-    ],
-  },
-  {
-    id: 57, name: "RIZKI 58", category: "Rizki",
-    description: "Template undangan cantik dengan desain timeless. Elegan dan cocok untuk berbagai tema pernikahan.",
-    size: "11.2 x 19 cm", color: "Softcover BC 150G",
-    pages: [{ label: "Pembuka", src: "https://imglinkv-3.vercel.app/api/images/cmrig0swsutj2jdo1/file" }],
-    specs: [
-      { label: "Ukuran Lipat", value: "11.2cm x 19cm" },
-      { label: "Ukuran Terbuka", value: "19cm x 20.3cm" },
-      { label: "Plastik OPP", value: "12cm x 22cm" },
-      { label: "Jenis Kertas", value: "BC 150G" },
-      { label: "Jenis Blangko", value: "Softcover" },
-      { label: "Foil", value: "Tidak ada" },
-      { label: "Harga", value: "Rp 1.600/pcs" },
-      { label: "Pre Order", value: "3-7 Hari" },
-      { label: "Min Order", value: "50 Pcs" },
-      { label: "Note", value: "Sudah termasuk plastik OPP" },
-    ],
-  },
-  {
-    id: 58, name: "RIZKI 59", category: "Rizki",
-    description: "Template undangan cantik dengan desain timeless. Elegan dan cocok untuk berbagai tema pernikahan.",
-    size: "13.5 x 19 cm", color: "Softcover BC 150G",
-    pages: [{ label: "Pembuka", src: "https://imglinkv-3.vercel.app/api/images/cmrig0uc6wc69tlts/file" }],
-    specs: [
-      { label: "Ukuran Lipat", value: "13.5cm x 19cm" },
-      { label: "Ukuran Terbuka", value: "19cm x 20.3cm" },
-      { label: "Plastik OPP", value: "14cm x 22cm" },
-      { label: "Jenis Kertas", value: "BC 150G" },
-      { label: "Jenis Blangko", value: "Softcover" },
-      { label: "Foil", value: "Tidak ada" },
-      { label: "Harga", value: "Rp 1.600/pcs" },
-      { label: "Pre Order", value: "3-7 Hari" },
-      { label: "Min Order", value: "50 Pcs" },
-      { label: "Note", value: "Sudah termasuk plastik OPP" },
-    ],
-  },
-  {
-    id: 59, name: "RIZKI 60", category: "Rizki",
-    description: "Template undangan cantik dengan desain timeless. Elegan dan cocok untuk berbagai tema pernikahan.",
-    size: "13.5 x 19 cm", color: "Softcover BC 150G",
-    pages: [{ label: "Pembuka", src: "https://imglinkv-3.vercel.app/api/images/cmrig0veax6p032of/file" }],
-    specs: [
-      { label: "Ukuran Lipat", value: "13.5cm x 19cm" },
-      { label: "Ukuran Terbuka", value: "19cm x 20.3cm" },
-      { label: "Plastik OPP", value: "14cm x 22cm" },
-      { label: "Jenis Kertas", value: "BC 150G" },
-      { label: "Jenis Blangko", value: "Softcover" },
-      { label: "Foil", value: "Tidak ada" },
-      { label: "Harga", value: "Rp 1.600/pcs" },
-      { label: "Pre Order", value: "3-7 Hari" },
-      { label: "Min Order", value: "50 Pcs" },
-      { label: "Note", value: "Sudah termasuk plastik OPP" },
-    ],
-  },
-  {
-    id: 60, name: "RIZKI 61", category: "Rizki",
-    description: "Template undangan cantik dengan desain timeless. Elegan dan cocok untuk berbagai tema pernikahan.",
-    size: "13.5 x 19 cm", color: "Softcover BC 150G",
-    pages: [{ label: "Pembuka", src: "https://imglinkv-3.vercel.app/api/images/cmrig0wgk3d0lihpf/file" }],
-    specs: [
-      { label: "Ukuran Lipat", value: "13.5cm x 19cm" },
-      { label: "Ukuran Terbuka", value: "19cm x 20.3cm" },
-      { label: "Plastik OPP", value: "14cm x 22cm" },
-      { label: "Jenis Kertas", value: "BC 150G" },
-      { label: "Jenis Blangko", value: "Softcover" },
-      { label: "Foil", value: "Tidak ada" },
-      { label: "Harga", value: "Rp 1.750/pcs" },
-      { label: "Pre Order", value: "3-7 Hari" },
-      { label: "Min Order", value: "50 Pcs" },
-      { label: "Note", value: "Sudah termasuk plastik OPP" },
-    ],
-  },
-  {
-    id: 61, name: "RIZKI 62", category: "Rizki",
-    description: "Template undangan cantik dengan desain timeless. Elegan dan cocok untuk berbagai tema pernikahan.",
-    size: "13.5 x 19 cm", color: "Softcover BC 150G",
-    pages: [{ label: "Pembuka", src: "https://imglinkv-3.vercel.app/api/images/cmrig0xe6bpc3m62h/file" }],
-    specs: [
-      { label: "Ukuran Lipat", value: "13.5cm x 19cm" },
-      { label: "Ukuran Terbuka", value: "19cm x 20.3cm" },
-      { label: "Plastik OPP", value: "14cm x 22cm" },
-      { label: "Jenis Kertas", value: "BC 150G" },
-      { label: "Jenis Blangko", value: "Softcover" },
-      { label: "Foil", value: "Tidak ada" },
-      { label: "Harga", value: "Rp 1.750/pcs" },
-      { label: "Pre Order", value: "3-7 Hari" },
-      { label: "Min Order", value: "50 Pcs" },
-      { label: "Note", value: "Sudah termasuk plastik OPP" },
-    ],
-  },
-  // === JAVANESE ===
-  {
-    id: 62, name: "JR 1", category: "Javanese",
-    description: "Undangan bertema Jawa dengan sentuhan batik dan nuansa keraton yang mewah dan penuh tradisi.",
-    size: "14 x 20 cm", color: "Softcover BC 150G",
-    pages: [{ label: "Pembuka", src: "https://imglinkv-3.vercel.app/api/images/cmrifz176pcqkb9ob/file" }],
-    specs: [
-      { label: "Ukuran Lipat", value: "14cm x 20cm" },
-      { label: "Ukuran Terbuka", value: "20cm x 28cm" },
-      { label: "Plastik OPP", value: "14cm x 22cm" },
-      { label: "Jenis Kertas", value: "BC 150G" },
-      { label: "Jenis Blangko", value: "Softcover" },
-      { label: "Foil", value: "Tidak ada" },
-      { label: "Harga", value: "Rp 1.500/pcs" },
-      { label: "Pre Order", value: "5-10 Hari" },
-      { label: "Min Order", value: "100 Pcs" },
-      { label: "Free Buku Tamu", value: "Min Order 300 Pcs" },
-      { label: "Note", value: "Belum termasuk plastik OPP | Free plastik OPP untuk order kelipatan 100" },
-    ],
-  },
-  {
-    id: 63, name: "JR 2", category: "Javanese",
-    description: "Undangan bertema Jawa dengan sentuhan batik dan nuansa keraton yang mewah dan penuh tradisi.",
-    size: "14 x 20 cm", color: "Softcover BC 150G",
-    pages: [{ label: "Pembuka", src: "https://imglinkv-3.vercel.app/api/images/cmrifz2rpy2jm7a80/file" }],
-    specs: [
-      { label: "Ukuran Lipat", value: "14cm x 20cm" },
-      { label: "Ukuran Terbuka", value: "20cm x 28cm" },
-      { label: "Plastik OPP", value: "14cm x 22cm" },
-      { label: "Jenis Kertas", value: "BC 150G" },
-      { label: "Jenis Blangko", value: "Softcover" },
-      { label: "Foil", value: "Tidak ada" },
-      { label: "Harga", value: "Rp 1.500/pcs" },
-      { label: "Pre Order", value: "5-10 Hari" },
-      { label: "Min Order", value: "100 Pcs" },
-      { label: "Free Buku Tamu", value: "Min Order 300 Pcs" },
-      { label: "Note", value: "Belum termasuk plastik OPP | Free plastik OPP untuk order kelipatan 100" },
-    ],
-  },
-  {
-    id: 64, name: "JR 3", category: "Javanese",
-    description: "Undangan bertema Jawa dengan sentuhan batik dan nuansa keraton yang mewah dan penuh tradisi.",
-    size: "14 x 20 cm", color: "Softcover BC 150G",
-    pages: [{ label: "Pembuka", src: "https://imglinkv-3.vercel.app/api/images/cmrifz3pjzmjjvjdh/file" }],
-    specs: [
-      { label: "Ukuran Lipat", value: "14cm x 20cm" },
-      { label: "Ukuran Terbuka", value: "20cm x 28cm" },
-      { label: "Plastik OPP", value: "14cm x 22cm" },
-      { label: "Jenis Kertas", value: "BC 150G" },
-      { label: "Jenis Blangko", value: "Softcover" },
-      { label: "Foil", value: "Tidak ada" },
-      { label: "Harga", value: "Rp 1.500/pcs" },
-      { label: "Pre Order", value: "5-10 Hari" },
-      { label: "Min Order", value: "100 Pcs" },
-      { label: "Free Buku Tamu", value: "Min Order 300 Pcs" },
-      { label: "Note", value: "Belum termasuk plastik OPP | Free plastik OPP untuk order kelipatan 100" },
-    ],
-  },
-  {
-    id: 65, name: "JR 4", category: "Javanese",
-    description: "Undangan bertema Jawa dengan sentuhan batik dan nuansa keraton yang mewah dan penuh tradisi.",
-    size: "14 x 20 cm", color: "Softcover BC 150G",
-    pages: [{ label: "Pembuka", src: "https://imglinkv-3.vercel.app/api/images/cmrifz4nyati3eehs/file" }],
-    specs: [
-      { label: "Ukuran Lipat", value: "14cm x 20cm" },
-      { label: "Ukuran Terbuka", value: "20cm x 28cm" },
-      { label: "Plastik OPP", value: "14cm x 22cm" },
-      { label: "Jenis Kertas", value: "BC 150G" },
-      { label: "Jenis Blangko", value: "Softcover" },
-      { label: "Foil", value: "Tidak ada" },
-      { label: "Harga", value: "Rp 1.500/pcs" },
-      { label: "Pre Order", value: "5-10 Hari" },
-      { label: "Min Order", value: "100 Pcs" },
-      { label: "Free Buku Tamu", value: "Min Order 300 Pcs" },
-      { label: "Note", value: "Belum termasuk plastik OPP | Free plastik OPP untuk order kelipatan 100" },
-    ],
-  },
-  {
-    id: 66, name: "JR 5", category: "Javanese",
-    description: "Undangan bertema Jawa dengan sentuhan batik dan nuansa keraton yang mewah dan penuh tradisi.",
-    size: "14 x 20 cm", color: "Softcover BC 150G",
-    pages: [{ label: "Pembuka", src: "https://imglinkv-3.vercel.app/api/images/cmrifz5l8w8wr01eo/file" }],
-    specs: [
-      { label: "Ukuran Lipat", value: "14cm x 20cm" },
-      { label: "Ukuran Terbuka", value: "20cm x 28cm" },
-      { label: "Plastik OPP", value: "14cm x 22cm" },
-      { label: "Jenis Kertas", value: "BC 150G" },
-      { label: "Jenis Blangko", value: "Softcover" },
-      { label: "Foil", value: "Tidak ada" },
-      { label: "Harga", value: "Rp 1.500/pcs" },
-      { label: "Pre Order", value: "5-10 Hari" },
-      { label: "Min Order", value: "100 Pcs" },
-      { label: "Free Buku Tamu", value: "Min Order 300 Pcs" },
-      { label: "Note", value: "Belum termasuk plastik OPP | Free plastik OPP untuk order kelipatan 100" },
-    ],
-  },
-  // === RUSTIK ===
-  {
-    id: 67, name: "R8", category: "Rustik",
-    description: "Desain undangan rustic yang hangat dan natural. Pilihan sempurna untuk pernikahan outdoor atau garden party.",
-    size: "14 x 20 cm", color: "Softcover BC 150G",
-    pages: [{ label: "Pembuka", src: "https://imglinkv-3.vercel.app/api/images/cmrig11giskp36rjo/file" }],
-    specs: [
-      { label: "Ukuran Lipat", value: "14cm x 20cm" },
-      { label: "Ukuran Terbuka", value: "20cm x 28cm" },
-      { label: "Plastik OPP", value: "14cm x 22cm" },
-      { label: "Jenis Kertas", value: "BC 150G" },
-      { label: "Jenis Blangko", value: "Softcover" },
-      { label: "Foil", value: "Tidak ada" },
-      { label: "Harga", value: "Rp 1.500/pcs" },
-      { label: "Pre Order", value: "5-10 Hari" },
-      { label: "Min Order", value: "100 Pcs" },
-      { label: "Free Buku Tamu", value: "Min Order 300 Pcs" },
-      { label: "Note", value: "Belum termasuk plastik OPP | Free plastik OPP untuk order kelipatan 100" },
-    ],
-  },
-  {
-    id: 68, name: "R9", category: "Rustik",
-    description: "Desain undangan rustic yang hangat dan natural. Pilihan sempurna untuk pernikahan outdoor atau garden party.",
-    size: "14 x 20 cm", color: "Softcover BC 150G",
-    pages: [{ label: "Pembuka", src: "https://imglinkv-3.vercel.app/api/images/cmrig132ak26y2fp2/file" }],
-    specs: [
-      { label: "Ukuran Lipat", value: "14cm x 20cm" },
-      { label: "Ukuran Terbuka", value: "20cm x 28cm" },
-      { label: "Plastik OPP", value: "14cm x 22cm" },
-      { label: "Jenis Kertas", value: "BC 150G" },
-      { label: "Jenis Blangko", value: "Softcover" },
-      { label: "Foil", value: "Tidak ada" },
-      { label: "Harga", value: "Rp 1.500/pcs" },
-      { label: "Pre Order", value: "5-10 Hari" },
-      { label: "Min Order", value: "100 Pcs" },
-      { label: "Free Buku Tamu", value: "Min Order 300 Pcs" },
-      { label: "Note", value: "Belum termasuk plastik OPP | Free plastik OPP untuk order kelipatan 100" },
-    ],
-  },
-  {
-    id: 69, name: "R11", category: "Rustik",
-    description: "Desain undangan rustic yang hangat dan natural. Pilihan sempurna untuk pernikahan outdoor atau garden party.",
-    size: "14 x 20 cm", color: "Softcover BC 150G",
-    pages: [{ label: "Pembuka", src: "https://imglinkv-3.vercel.app/api/images/cmrig146weq9gj9wg/file" }],
-    specs: [
-      { label: "Ukuran Lipat", value: "14cm x 20cm" },
-      { label: "Ukuran Terbuka", value: "20cm x 28cm" },
-      { label: "Plastik OPP", value: "14cm x 22cm" },
-      { label: "Jenis Kertas", value: "BC 150G" },
-      { label: "Jenis Blangko", value: "Softcover" },
-      { label: "Foil", value: "Tidak ada" },
-      { label: "Harga", value: "Rp 1.500/pcs" },
-      { label: "Pre Order", value: "5-10 Hari" },
-      { label: "Min Order", value: "100 Pcs" },
-      { label: "Free Buku Tamu", value: "Min Order 300 Pcs" },
-      { label: "Note", value: "Belum termasuk plastik OPP | Free plastik OPP untuk order kelipatan 100" },
-    ],
-  },
-  {
-    id: 70, name: "R22", category: "Rustik",
-    description: "Desain undangan rustic yang hangat dan natural. Pilihan sempurna untuk pernikahan outdoor atau garden party.",
-    size: "14 x 20 cm", color: "Softcover BC 150G",
-    pages: [{ label: "Pembuka", src: "https://imglinkv-3.vercel.app/api/images/cmrig150twas22jep/file" }],
-    specs: [
-      { label: "Ukuran Lipat", value: "14cm x 20cm" },
-      { label: "Ukuran Terbuka", value: "20cm x 28cm" },
-      { label: "Plastik OPP", value: "14cm x 22cm" },
-      { label: "Jenis Kertas", value: "BC 150G" },
-      { label: "Jenis Blangko", value: "Softcover" },
-      { label: "Foil", value: "Tidak ada" },
-      { label: "Harga", value: "Rp 1.500/pcs" },
-      { label: "Pre Order", value: "5-10 Hari" },
-      { label: "Min Order", value: "100 Pcs" },
-      { label: "Free Buku Tamu", value: "Min Order 300 Pcs" },
-      { label: "Note", value: "Belum termasuk plastik OPP | Free plastik OPP untuk order kelipatan 100" },
-    ],
-  },
-  {
-    id: 71, name: "R24", category: "Rustik",
-    description: "Desain undangan rustic yang hangat dan natural. Pilihan sempurna untuk pernikahan outdoor atau garden party.",
-    size: "14 x 20 cm", color: "Softcover BC 150G",
-    pages: [{ label: "Pembuka", src: "https://imglinkv-3.vercel.app/api/images/cmrig16a83bxfmgqi/file" }],
-    specs: [
-      { label: "Ukuran Lipat", value: "14cm x 20cm" },
-      { label: "Ukuran Terbuka", value: "20cm x 28cm" },
-      { label: "Plastik OPP", value: "14cm x 22cm" },
-      { label: "Jenis Kertas", value: "BC 150G" },
-      { label: "Jenis Blangko", value: "Softcover" },
-      { label: "Foil", value: "Tidak ada" },
-      { label: "Harga", value: "Rp 1.500/pcs" },
-      { label: "Pre Order", value: "5-10 Hari" },
-      { label: "Min Order", value: "100 Pcs" },
-      { label: "Free Buku Tamu", value: "Min Order 300 Pcs" },
-      { label: "Note", value: "Belum termasuk plastik OPP | Free plastik OPP untuk order kelipatan 100" },
-    ],
-  },
-  {
-    id: 72, name: "R26", category: "Rustik",
-    description: "Desain undangan rustic yang hangat dan natural. Pilihan sempurna untuk pernikahan outdoor atau garden party.",
-    size: "14 x 20 cm", color: "Softcover BC 150G",
-    pages: [{ label: "Pembuka", src: "https://imglinkv-3.vercel.app/api/images/cmrig17d703raola3/file" }],
-    specs: [
-      { label: "Ukuran Lipat", value: "14cm x 20cm" },
-      { label: "Ukuran Terbuka", value: "20cm x 28cm" },
-      { label: "Plastik OPP", value: "14cm x 22cm" },
-      { label: "Jenis Kertas", value: "BC 150G" },
-      { label: "Jenis Blangko", value: "Softcover" },
-      { label: "Foil", value: "Tidak ada" },
-      { label: "Harga", value: "Rp 1.500/pcs" },
-      { label: "Pre Order", value: "5-10 Hari" },
-      { label: "Min Order", value: "100 Pcs" },
-      { label: "Free Buku Tamu", value: "Min Order 300 Pcs" },
-      { label: "Note", value: "Belum termasuk plastik OPP | Free plastik OPP untuk order kelipatan 100" },
-    ],
-  },
-  {
-    id: 73, name: "R27", category: "Rustik",
-    description: "Desain undangan rustic yang hangat dan natural. Pilihan sempurna untuk pernikahan outdoor atau garden party.",
-    size: "14 x 20 cm", color: "Softcover BC 150G",
-    pages: [{ label: "Pembuka", src: "https://imglinkv-3.vercel.app/api/images/cmrig18ehxfnhlx6n/file" }],
-    specs: [
-      { label: "Ukuran Lipat", value: "14cm x 20cm" },
-      { label: "Ukuran Terbuka", value: "20cm x 28cm" },
-      { label: "Plastik OPP", value: "14cm x 22cm" },
-      { label: "Jenis Kertas", value: "BC 150G" },
-      { label: "Jenis Blangko", value: "Softcover" },
-      { label: "Foil", value: "Tidak ada" },
-      { label: "Harga", value: "Rp 1.500/pcs" },
-      { label: "Pre Order", value: "5-10 Hari" },
-      { label: "Min Order", value: "100 Pcs" },
-      { label: "Free Buku Tamu", value: "Min Order 300 Pcs" },
-      { label: "Note", value: "Belum termasuk plastik OPP | Free plastik OPP untuk order kelipatan 100" },
-    ],
-  },
-  // === ELEGAN ===
-  {
-    id: 80, name: "AI1", category: "Elegan",
-    description: "Desain undangan elegan dengan sentuhan minimalis dan sophisticated. Pilihan tepat untuk pernikahan berkelas.",
-    size: "13 x 19,9 cm", color: "Softcover BC",
-    pages: [{ label: "Pembuka", src: "https://imglinkv-3.vercel.app/api/images/cmrify83civ5s0ie5/file" }],
-    specs: [
-      { label: "Ukuran Lipat", value: "14cm x 20cm" },
-      { label: "Ukuran Terbuka", value: "20cm x 28cm" },
-      { label: "Plastik OPP", value: "14cm x 22cm" },
-      { label: "Jenis Kertas", value: "BC 150G" },
-      { label: "Jenis Blangko", value: "Softcover" },
-      { label: "Foil", value: "Tidak ada" },
-      { label: "Harga", value: "Rp 4.000/pcs" },
-      { label: "Pre Order", value: "7-14 Hari" },
-      { label: "Min Order", value: "50 Pcs" },
-      { label: "Free Buku Tamu", value: "Min Order 200 Pcs" },
-      { label: "Note", value: "Belum termasuk plastik OPP | Free plastik OPP untuk order kelipatan 100" },
-    ],
-  },
-  {
-    id: 81, name: "AI2", category: "Elegan",
-    description: "Desain undangan elegan dengan sentuhan minimalis dan sophisticated. Pilihan tepat untuk pernikahan berkelas.",
-    size: "13 x 19,9 cm", color: "Softcover BC",
-    pages: [{ label: "Pembuka", src: "https://imglinkv-3.vercel.app/api/images/cmrify9h11fa0cuaa/file" }],
-    specs: [
-      { label: "Ukuran Lipat", value: "14cm x 20cm" },
-      { label: "Ukuran Terbuka", value: "20cm x 28cm" },
-      { label: "Plastik OPP", value: "14cm x 22cm" },
-      { label: "Jenis Kertas", value: "BC 150G" },
-      { label: "Jenis Blangko", value: "Softcover" },
-      { label: "Foil", value: "Tidak ada" },
-      { label: "Harga", value: "Rp 4.000/pcs" },
-      { label: "Pre Order", value: "7-14 Hari" },
-      { label: "Min Order", value: "50 Pcs" },
-      { label: "Free Buku Tamu", value: "Min Order 200 Pcs" },
-      { label: "Note", value: "Belum termasuk plastik OPP | Free plastik OPP untuk order kelipatan 100" },
-    ],
-  },
-  {
-    id: 82, name: "AI3", category: "Elegan",
-    description: "Desain undangan elegan dengan sentuhan minimalis dan sophisticated. Pilihan tepat untuk pernikahan berkelas.",
-    size: "13 x 19,9 cm", color: "Softcover BC",
-    pages: [{ label: "Pembuka", src: "https://imglinkv-3.vercel.app/api/images/cmrifyb2ft33w1fju/file" }],
-    specs: [
-      { label: "Ukuran Lipat", value: "14cm x 20cm" },
-      { label: "Ukuran Terbuka", value: "20cm x 28cm" },
-      { label: "Plastik OPP", value: "14cm x 22cm" },
-      { label: "Jenis Kertas", value: "BC 150G" },
-      { label: "Jenis Blangko", value: "Softcover" },
-      { label: "Foil", value: "Tidak ada" },
-      { label: "Harga", value: "Rp 4.000/pcs" },
-      { label: "Pre Order", value: "7-14 Hari" },
-      { label: "Min Order", value: "50 Pcs" },
-      { label: "Free Buku Tamu", value: "Min Order 200 Pcs" },
-      { label: "Note", value: "Belum termasuk plastik OPP | Free plastik OPP untuk order kelipatan 100" },
-    ],
-  },
-  {
-    id: 83, name: "AI4", category: "Elegan",
-    description: "Desain undangan elegan dengan sentuhan minimalis dan sophisticated. Pilihan tepat untuk pernikahan berkelas.",
-    size: "13 x 19,9 cm", color: "Softcover BC",
-    pages: [{ label: "Pembuka", src: "https://imglinkv-3.vercel.app/api/images/cmrifyc3sxyfowsry/file" }],
-    specs: [
-      { label: "Ukuran Lipat", value: "14cm x 20cm" },
-      { label: "Ukuran Terbuka", value: "20cm x 28cm" },
-      { label: "Plastik OPP", value: "14cm x 22cm" },
-      { label: "Jenis Kertas", value: "BC 150G" },
-      { label: "Jenis Blangko", value: "Softcover" },
-      { label: "Foil", value: "Tidak ada" },
-      { label: "Harga", value: "Rp 4.000/pcs" },
-      { label: "Pre Order", value: "7-14 Hari" },
-      { label: "Min Order", value: "50 Pcs" },
-      { label: "Free Buku Tamu", value: "Min Order 200 Pcs" },
-      { label: "Note", value: "Belum termasuk plastik OPP | Free plastik OPP untuk order kelipatan 100" },
-    ],
-  },
-  {
-    id: 84, name: "AI6", category: "Elegan",
-    description: "Desain undangan elegan dengan sentuhan minimalis dan sophisticated. Pilihan tepat untuk pernikahan berkelas.",
-    size: "13 x 19,9 cm", color: "Softcover BC",
-    pages: [{ label: "Pembuka", src: "https://imglinkv-3.vercel.app/api/images/cmrifydcz0i3m3ryy/file" }],
-    specs: [
-      { label: "Ukuran Lipat", value: "14cm x 20cm" },
-      { label: "Ukuran Terbuka", value: "20cm x 28cm" },
-      { label: "Plastik OPP", value: "14cm x 22cm" },
-      { label: "Jenis Kertas", value: "BC 150G" },
-      { label: "Jenis Blangko", value: "Softcover" },
-      { label: "Foil", value: "Tidak ada" },
-      { label: "Harga", value: "Rp 4.000/pcs" },
-      { label: "Pre Order", value: "7-14 Hari" },
-      { label: "Min Order", value: "50 Pcs" },
-      { label: "Free Buku Tamu", value: "Min Order 200 Pcs" },
-      { label: "Note", value: "Belum termasuk plastik OPP | Free plastik OPP untuk order kelipatan 100" },
-    ],
-  },
-  {
-    id: 85, name: "AI8", category: "Elegan",
-    description: "Desain undangan elegan dengan sentuhan minimalis dan sophisticated. Pilihan tepat untuk pernikahan berkelas.",
-    size: "13 x 19,9 cm", color: "Softcover BC",
-    pages: [{ label: "Pembuka", src: "https://imglinkv-3.vercel.app/api/images/cmrifyekxnxyj0p4e/file" }],
-    specs: [
-      { label: "Ukuran Lipat", value: "14cm x 20cm" },
-      { label: "Ukuran Terbuka", value: "20cm x 28cm" },
-      { label: "Plastik OPP", value: "14cm x 22cm" },
-      { label: "Jenis Kertas", value: "BC 150G" },
-      { label: "Jenis Blangko", value: "Softcover" },
-      { label: "Foil", value: "Tidak ada" },
-      { label: "Harga", value: "Rp 4.000/pcs" },
-      { label: "Pre Order", value: "7-14 Hari" },
-      { label: "Min Order", value: "50 Pcs" },
-      { label: "Free Buku Tamu", value: "Min Order 200 Pcs" },
-      { label: "Note", value: "Belum termasuk plastik OPP | Free plastik OPP untuk order kelipatan 100" },
-    ],
-  },
-  {
-    id: 86, name: "AI10", category: "Elegan",
-    description: "Desain undangan elegan dengan sentuhan minimalis dan sophisticated. Pilihan tepat untuk pernikahan berkelas.",
-    size: "13 x 19,9 cm", color: "Softcover BC",
-    pages: [{ label: "Pembuka", src: "https://imglinkv-3.vercel.app/api/images/cmrifyfc2w1dks5em/file" }],
-    specs: [
-      { label: "Ukuran Lipat", value: "14cm x 20cm" },
-      { label: "Ukuran Terbuka", value: "20cm x 28cm" },
-      { label: "Plastik OPP", value: "14cm x 22cm" },
-      { label: "Jenis Kertas", value: "BC 150G" },
-      { label: "Jenis Blangko", value: "Softcover" },
-      { label: "Foil", value: "Tidak ada" },
-      { label: "Harga", value: "Rp 4.000/pcs" },
-      { label: "Pre Order", value: "7-14 Hari" },
-      { label: "Min Order", value: "50 Pcs" },
-      { label: "Free Buku Tamu", value: "Min Order 200 Pcs" },
-      { label: "Note", value: "Belum termasuk plastik OPP | Free plastik OPP untuk order kelipatan 100" },
-    ],
-  },
-];
-
-const onlineTemplates: Template[] = [
-  {
-    id: 201,
-    name: "Serene Love",
-    category: "Semua",
-    description: "Undangan website elegan dengan nuansa botani yang tenang dan romantis. Desain minimalis dengan sentuhan script font klasik.",
-    size: "Responsive Web",
-    color: "Botanical & Cream",
-    pages: [
-      { label: "Cover", src: "/invitations/online/demo/cover-ornament.png" },
-    ],
-  },
-  {
-    id: 202,
-    name: "Javanese",
-    category: "Semua",
-    description: "Undangan digital bertema Jawa dengan sentuhan batik emas dan nuansa keraton yang mewah. Elegan dan penuh tradisi.",
-    size: "Responsive Web",
-    color: "Gold & Dark Brown",
-    pages: [
-      { label: "Cover", src: "/invitations/online/javanese/thumb-ornament.png" },
-    ],
-  },
-  {
-    id: 203,
-    name: "Silent Promise",
-    category: "Semua",
-    description: "Undangan digital bergaya vintage watercolor dengan nuansa teal dan sentuhan tradisional. Romantis, elegan, dan penuh makna.",
-    size: "Responsive Web",
-    color: "Teal & Beige Vintage",
-    pages: [
-      { label: "Cover", src: "/invitations/online/silent-promise/thumb-ornament.png" },
-    ],
-  },
-  {
-    id: 204,
-    name: "Palawa Bloom",
-    category: "Semua",
-    description: "Undangan digital bergaya monokromatik hitam putih yang minimalis dan elegan. Desain timeless dengan sentuhan floral watercolor yang lembut.",
-    size: "Responsive Web",
-    color: "Black & White Minimalist",
-    pages: [
-      { label: "Cover", src: "/invitations/online/palawa-bloom/thumb-ornament.png" },
-    ],
-  },
-  {
-    id: 205,
-    name: "White Free",
-    category: "Semua",
-    description: "Undangan digital bergaya minimalis modern dengan dominasi warna putih dan navy. Desain bersih, elegan, dan profesional dengan tipografi serif yang sophisticated.",
-    size: "Responsive Web",
-    color: "White & Navy Minimalist",
-    pages: [
-      { label: "Cover", src: "/invitations/online/white-free/thumb-ornament.png" },
-    ],
-  },
-  {
-    id: 206,
-    name: "Javanese V2",
-    category: "Semua",
-    description: "Undangan digital bertema Jawa versi terbaru. Sentuhan tradisional dengan desain modern.",
-    size: "Responsive Web",
-    color: "Javanese Modern",
-    pages: [
-      { label: "Cover", src: "/invitations/online/javanese/thumb-ornament.png" },
-    ],
-  },
-];
-
-const cetakCategories = ["Semua", "Cantik", "Hepi", "Maliq", "Lintang", "Rayya", "Rizki", "Javanese", "Rustik", "Elegan"];
-const onlineCategories = ["Semua"];
-
-const cetakCategoryMeta: { name: string; color: string; description: string; emoji: string; image: string }[] = [
-  { name: "Cantik", color: "rose", description: "Desain elegan dan modern", emoji: "🌸", image: "https://imglinkv-3.vercel.app/api/images/cmro2bnpy0emsv7xm/file" },
-  { name: "Hepi", color: "amber", description: "Desain ceria dan berwarna", emoji: "🎉", image: "https://imglinkv-3.vercel.app/api/images/cmro2bsdkw8jrutvo/file" },
-  { name: "Maliq", color: "emerald", description: "Desain maskulin dan sophisticated", emoji: "💎", image: "https://imglinkv-3.vercel.app/api/images/cmro2bw8oa57mijyt/file" },
-  { name: "Lintang", color: "violet", description: "Desain bintang dan kemewahan", emoji: "✨", image: "https://imglinkv-3.vercel.app/api/images/cmro2c2227ispwivk/file" },
-  { name: "Rayya", color: "pink", description: "Desain mewah dan anggun", emoji: "🌹", image: "https://imglinkv-3.vercel.app/api/images/cmro2by5f3j9a579c/file" },
-  { name: "Rizki", color: "sky", description: "Desain kekinian dan stylish", emoji: "🌺", image: "https://imglinkv-3.vercel.app/api/images/cmro2c02ggm8faazc/file" },
-  { name: "Javanese", color: "yellow", description: "Sentuhan batik dan tradisi", emoji: "🏛️", image: "https://imglinkv-3.vercel.app/api/images/cmro2c3ti8ybjfxth/file" },
-  { name: "Rustik", color: "orange", description: "Nuansa alam dan natural", emoji: "🌿", image: "https://imglinkv-3.vercel.app/api/images/cmro2buf7y63rfty5/file" },
-  { name: "Elegan", color: "stone", description: "Minimalis dan sophisticated", emoji: "🖤", image: "https://imglinkv-3.vercel.app/api/images/cmro2bqa5unebq4xn/file" },
-];
+import {
+  type TemplateType,
+  type Template,
+  cetakTemplates,
+  onlineTemplates,
+  cetakCategories,
+  onlineCategories,
+  cetakCategoryMeta,
+} from "@/data/templates";
 
 export default function HomePage() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -1461,8 +54,7 @@ export default function HomePage() {
   const [selectedTemplate, setSelectedTemplate] = useState<Template | null>(null);
   const [selectedPageIndex, setSelectedPageIndex] = useState(0);
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [showOnlinePreview, setShowOnlinePreview] = useState(false);
-  const [onlinePreviewId, setOnlinePreviewId] = useState<number | null>(null);
+  const { toast } = useToast();
 
   const [showShowcase, setShowShowcase] = useState(false);
   const [showCaraPemesanan, setShowCaraPemesanan] = useState(false);
@@ -1504,6 +96,13 @@ export default function HomePage() {
   };
 
   const toggleGrid = (type: TemplateType) => {
+    if (type === "online") {
+      toast({
+        title: "Coming Soon 🔜",
+        description: "Koleksi undangan digital sedang dalam pengerjaan. Nantikan ya!",
+      });
+      return;
+    }
     if (showGrid && templateType === type) {
       setShowGrid(false);
       setActiveCategory(null);
@@ -1528,11 +127,6 @@ export default function HomePage() {
   const openModal = (template: Template, index: number) => {
     if (template.link) {
       window.open(template.link, "_blank");
-      return;
-    }
-    if (templateType === "online") {
-      setShowOnlinePreview(true);
-      setOnlinePreviewId(template.id);
       return;
     }
     setSelectedTemplate(template);
@@ -1588,6 +182,7 @@ export default function HomePage() {
             </div>
             <nav className="hidden sm:flex items-center gap-6 text-sm text-stone-600">
               <button onClick={() => toggleShowcase()} className="hover:text-rose-600 transition-colors">Template</button>
+              <a href="#faq" className="hover:text-rose-600 transition-colors">FAQ</a>
               <a href="#kontak" className="hover:text-rose-600 transition-colors">Kontak</a>
             </nav>
             <Button
@@ -1615,6 +210,7 @@ export default function HomePage() {
             <nav className="flex flex-col px-4 py-3 gap-1">
               {[
                 { label: "Template", href: "#templates" },
+                { label: "FAQ", href: "#faq" },
                 { label: "Kontak", href: "#kontak" },
               ].map((item) => (
                 item.label === "Template" ? (
@@ -1846,6 +442,9 @@ export default function HomePage() {
                         sky: "border-sky-300",
                         yellow: "border-yellow-300",
                         orange: "border-orange-300",
+                        teal: "border-teal-300",
+                        cyan: "border-cyan-300",
+                        lime: "border-lime-300",
                       };
                       const bgColor: Record<string, string> = {
                         rose: "bg-rose-50",
@@ -1856,6 +455,9 @@ export default function HomePage() {
                         sky: "bg-sky-50",
                         yellow: "bg-yellow-50",
                         orange: "bg-orange-50",
+                        teal: "bg-teal-50",
+                        cyan: "bg-cyan-50",
+                        lime: "bg-lime-50",
                       };
                       const badgeBg: Record<string, string> = {
                         rose: "bg-rose-500",
@@ -1866,6 +468,9 @@ export default function HomePage() {
                         sky: "bg-sky-500",
                         yellow: "bg-yellow-500",
                         orange: "bg-orange-500",
+                        teal: "bg-teal-500",
+                        cyan: "bg-cyan-500",
+                        lime: "bg-lime-500",
                       };
                       return (
                         <motion.button
@@ -2060,71 +665,7 @@ export default function HomePage() {
               </>
             )}
 
-            {/* ===== ONLINE: Flat grid (unchanged) ===== */}
-            {templateType === "online" && (
-              <>
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true, margin: "-100px" }}
-                  transition={{ duration: 0.6 }}
-                  className="text-center mb-8"
-                >
-                  <h2 className="text-3xl sm:text-4xl font-bold text-stone-900 tracking-tight">
-                    Pilih Template Favoritmu
-                  </h2>
-                  <p className="mt-3 text-stone-500 max-w-2xl mx-auto">
-                    Template undangan website interaktif. Klik untuk preview tampilannya.
-                  </p>
-                </motion.div>
-                <div className="grid grid-cols-2 gap-2.5 sm:gap-6 lg:grid-cols-3 lg:gap-8">
-                  <AnimatePresence mode="popLayout">
-                    {filteredTemplates.map((template, index) => (
-                      <motion.div
-                        key={template.id}
-                        layout
-                        initial={{ opacity: 0, y: 30 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, scale: 0.9 }}
-                        transition={{ duration: 0.4, delay: index * 0.08 }}
-                        className="group cursor-pointer"
-                        onClick={() => openModal(template, index)}
-                      >
-                        <div className="relative bg-white rounded-xl sm:rounded-2xl overflow-hidden shadow-md hover:shadow-xl transition-shadow duration-300 border border-rose-100/50">
-                          <div className="relative aspect-[3/4] sm:aspect-[768/1344] bg-rose-50 overflow-hidden">
-                            <Image
-                              src={template.pages[0].src}
-                              alt={template.name}
-                              fill
-                              className="object-cover object-top group-hover:scale-[1.02] transition-transform duration-500"
-                              sizes="(max-width: 1024px) 50vw, 33vw"
-                            />
-                            <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-300 hidden sm:flex items-center justify-center">
-                              <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                                <div className="bg-white/90 backdrop-blur-sm rounded-full p-3 shadow-lg">
-                                  <Eye className="h-5 w-5 text-rose-600" />
-                                </div>
-                              </div>
-                            </div>
-                            <Badge className="absolute top-2 right-2 bg-emerald-500/90 text-white border-0 text-[10px] px-1.5 py-0.5">
-                              ONLINE
-                            </Badge>
-                          </div>
-                          <div className="p-2.5 sm:p-5">
-                            <h3 className="font-semibold text-stone-900 text-sm sm:text-lg leading-tight truncate">
-                              {template.name}
-                            </h3>
-                            <p className="text-xs sm:text-sm text-stone-500 mt-0.5">
-                              {template.size}
-                            </p>
-                          </div>
-                        </div>
-                      </motion.div>
-                    ))}
-                  </AnimatePresence>
-                </div>
-              </>
-            )}
+
 
           </div>
         </section>
@@ -2360,6 +901,132 @@ export default function HomePage() {
         </motion.section>
         )}
         </AnimatePresence>
+
+        {/* FAQ Section */}
+        <section id="faq" className="py-16 sm:py-20 bg-gradient-to-b from-white to-stone-50">
+          <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-100px" }}
+              transition={{ duration: 0.6 }}
+              className="text-center mb-10 sm:mb-12"
+            >
+              <span className="inline-block text-rose-500 text-xs font-semibold tracking-widest uppercase mb-3">FAQ</span>
+              <h2 className="text-3xl sm:text-4xl font-bold text-stone-900 tracking-tight mb-4">
+                Pertanyaan yang Sering Diajukan
+              </h2>
+              <p className="text-stone-500 max-w-xl mx-auto">
+                Temukan jawaban untuk pertanyaan umum seputar undangan pernikahan kami.
+              </p>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-50px" }}
+              transition={{ duration: 0.6, delay: 0.15 }}
+            >
+              <Accordion type="single" collapsible className="space-y-3">
+                {/* ── Undangan Digital ── */}
+                <div className="mb-6">
+                  <div className="flex items-center gap-2 mb-3 px-1">
+                    <span className="text-lg">💡</span>
+                    <h3 className="text-sm font-bold text-stone-700 tracking-wide uppercase">Seputar Undangan Digital (Website/Video)</h3>
+                  </div>
+                  <AccordionItem value="dig-1" className="bg-white rounded-xl border border-stone-200/80 px-0 data-[state=open]:shadow-sm data-[state=open]:border-rose-200 transition-all">
+                    <AccordionTrigger className="text-left text-sm sm:text-[15px] font-semibold text-stone-800 hover:text-rose-600 hover:no-underline px-4 sm:px-5 py-4">
+                      Berapa lama proses pembuatan undangan digital?
+                    </AccordionTrigger>
+                    <AccordionContent className="text-stone-600 text-sm leading-relaxed px-4 sm:px-5 pb-4 pt-0">
+                      Proses kilat! Undangan digital berbasis website atau video biasanya selesai dalam <strong>1–2 hari kerja</strong> setelah data dan foto dari kamu kami terima lengkap.
+                    </AccordionContent>
+                  </AccordionItem>
+                  <AccordionItem value="dig-2" className="bg-white rounded-xl border border-stone-200/80 px-0 data-[state=open]:shadow-sm data-[state=open]:border-rose-200 transition-all">
+                    <AccordionTrigger className="text-left text-sm sm:text-[15px] font-semibold text-stone-800 hover:text-rose-600 hover:no-underline px-4 sm:px-5 py-4">
+                      Apakah ada batasan jumlah tamu yang bisa diundang?
+                    </AccordionTrigger>
+                    <AccordionContent className="text-stone-600 text-sm leading-relaxed px-4 sm:px-5 pb-4 pt-0">
+                      Tidak ada batasan sama sekali. Kamu bebas menyebarkan link undangan digital ke sebanyak mungkin keluarga, teman, dan kerabat <strong>tanpa biaya tambahan</strong>.
+                    </AccordionContent>
+                  </AccordionItem>
+                  <AccordionItem value="dig-3" className="bg-white rounded-xl border border-stone-200/80 px-0 data-[state=open]:shadow-sm data-[state=open]:border-rose-200 transition-all">
+                    <AccordionTrigger className="text-left text-sm sm:text-[15px] font-semibold text-stone-800 hover:text-rose-600 hover:no-underline px-4 sm:px-5 py-4">
+                      Berapa lama masa aktif link undangan digitalnya?
+                    </AccordionTrigger>
+                    <AccordionContent className="text-stone-600 text-sm leading-relaxed px-4 sm:px-5 pb-4 pt-0">
+                      Undangan digital website kamu akan aktif selama <strong>1 Bulan – 1 tahun</strong> terhitung sejak hari pernikahan. Jadi, momen bahagia kamu tetap bisa diakses dalam waktu lama.
+                    </AccordionContent>
+                  </AccordionItem>
+                  <AccordionItem value="dig-4" className="bg-white rounded-xl border border-stone-200/80 px-0 data-[state=open]:shadow-sm data-[state=open]:border-rose-200 transition-all">
+                    <AccordionTrigger className="text-left text-sm sm:text-[15px] font-semibold text-stone-800 hover:text-rose-600 hover:no-underline px-4 sm:px-5 py-4">
+                      Apakah data tamu atau foto bisa diubah setelah undangan jadi?
+                    </AccordionTrigger>
+                    <AccordionContent className="text-stone-600 text-sm leading-relaxed px-4 sm:px-5 pb-4 pt-0">
+                      Bisa! Kami memberikan fasilitas <strong>gratis revisi data/teks sebanyak 5 kali</strong> sebelum hari H jika ada perubahan jadwal atau kesalahan penulisan nama.
+                    </AccordionContent>
+                  </AccordionItem>
+                </div>
+
+                {/* ── Undangan Cetak ── */}
+                <div className="mb-6">
+                  <div className="flex items-center gap-2 mb-3 px-1">
+                    <span className="text-lg">🖨️</span>
+                    <h3 className="text-sm font-bold text-stone-700 tracking-wide uppercase">Seputar Undangan Cetak</h3>
+                  </div>
+                  <AccordionItem value="cetak-1" className="bg-white rounded-xl border border-stone-200/80 px-0 data-[state=open]:shadow-sm data-[state=open]:border-rose-200 transition-all">
+                    <AccordionTrigger className="text-left text-sm sm:text-[15px] font-semibold text-stone-800 hover:text-rose-600 hover:no-underline px-4 sm:px-5 py-4">
+                      Berapa minimal order (minimal pemesanan) untuk undangan cetak?
+                    </AccordionTrigger>
+                    <AccordionContent className="text-stone-600 text-sm leading-relaxed px-4 sm:px-5 pb-4 pt-0">
+                      Minimal pemesanan untuk undangan cetak adalah <strong>100 pcs</strong>. Jika memesan di atas 500 pcs, kamu mendapat undangan online / digital secara gratis.
+                    </AccordionContent>
+                  </AccordionItem>
+                  <AccordionItem value="cetak-2" className="bg-white rounded-xl border border-stone-200/80 px-0 data-[state=open]:shadow-sm data-[state=open]:border-rose-200 transition-all">
+                    <AccordionTrigger className="text-left text-sm sm:text-[15px] font-semibold text-stone-800 hover:text-rose-600 hover:no-underline px-4 sm:px-5 py-4">
+                      Apakah harga sudah termasuk plastik pembungkus dan kartu ucapan terima kasih?
+                    </AccordionTrigger>
+                    <AccordionContent className="text-stone-600 text-sm leading-relaxed px-4 sm:px-5 pb-4 pt-0">
+                      Sudah! Setiap pemesanan undangan cetak di tempat kami sudah <strong>gratis plastik OPP</strong>.
+                    </AccordionContent>
+                  </AccordionItem>
+                  <AccordionItem value="cetak-3" className="bg-white rounded-xl border border-stone-200/80 px-0 data-[state=open]:shadow-sm data-[state=open]:border-rose-200 transition-all">
+                    <AccordionTrigger className="text-left text-sm sm:text-[15px] font-semibold text-stone-800 hover:text-rose-600 hover:no-underline px-4 sm:px-5 py-4">
+                      Berapa lama proses cetak hingga pengiriman?
+                    </AccordionTrigger>
+                    <AccordionContent className="text-stone-600 text-sm leading-relaxed px-4 sm:px-5 pb-4 pt-0">
+                      Setelah desain disetujui (proofread oke), proses cetak memakan waktu sekitar <strong>7–14 hari kerja</strong>, tergantung tingkat kerumitan desain dan antrean produksi. Kami sarankan pesan minimal 1 bulan sebelum acara.
+                    </AccordionContent>
+                  </AccordionItem>
+                </div>
+
+                {/* ── Pembayaran & Cara Order ── */}
+                <div>
+                  <div className="flex items-center gap-2 mb-3 px-1">
+                    <span className="text-lg">💳</span>
+                    <h3 className="text-sm font-bold text-stone-700 tracking-wide uppercase">Sistem Pembayaran & Cara Order</h3>
+                  </div>
+                  <AccordionItem value="pay-1" className="bg-white rounded-xl border border-stone-200/80 px-0 data-[state=open]:shadow-sm data-[state=open]:border-rose-200 transition-all">
+                    <AccordionTrigger className="text-left text-sm sm:text-[15px] font-semibold text-stone-800 hover:text-rose-600 hover:no-underline px-4 sm:px-5 py-4">
+                      Bagaimana sistem pembayarannya?
+                    </AccordionTrigger>
+                    <AccordionContent className="text-stone-600 text-sm leading-relaxed px-4 sm:px-5 pb-4 pt-0">
+                      Pembayaran dilakukan dengan sistem <strong>DP (Down Payment) sebesar 50%</strong> di awal untuk memulai proses desain. Pelunasan sisa 50% dilakukan setelah desain disetujui dan siap naik cetak/siap publish.
+                    </AccordionContent>
+                  </AccordionItem>
+                  <AccordionItem value="pay-2" className="bg-white rounded-xl border border-stone-200/80 px-0 data-[state=open]:shadow-sm data-[state=open]:border-rose-200 transition-all">
+                    <AccordionTrigger className="text-left text-sm sm:text-[15px] font-semibold text-stone-800 hover:text-rose-600 hover:no-underline px-4 sm:px-5 py-4">
+                      Bagaimana cara mengirimkan data pernikahan (nama, lokasi, foto)?
+                    </AccordionTrigger>
+                    <AccordionContent className="text-stone-600 text-sm leading-relaxed px-4 sm:px-5 pb-4 pt-0">
+                      Setelah melakukan DP, admin kami akan mengirimkan <strong>form digital</strong> yang bisa kamu isi lewat WhatsApp atau Email. Kamu tinggal isi nama pengantin, tanggal, lokasi share location, dan unggah foto-foto terbaikmu.
+                    </AccordionContent>
+                  </AccordionItem>
+                </div>
+              </Accordion>
+            </motion.div>
+          </div>
+        </section>
 
         {/* Contact Section */}
         <section id="kontak" className="py-16 sm:py-20 bg-white">
@@ -2626,41 +1293,38 @@ export default function HomePage() {
         </DialogContent>
       </Dialog>
 
-      {/* Online Invitation Previews */}
-      {showOnlinePreview && onlinePreviewId === 201 && (
-        <OnlineInvitation onClose={() => { setShowOnlinePreview(false); setOnlinePreviewId(null); }} />
-      )}
-      {showOnlinePreview && onlinePreviewId === 202 && (
-        <JavaneseInvitation onClose={() => { setShowOnlinePreview(false); setOnlinePreviewId(null); }} />
-      )}
-      {showOnlinePreview && onlinePreviewId === 203 && (
-        <SilentPromiseInvitation onClose={() => { setShowOnlinePreview(false); setOnlinePreviewId(null); }} />
-      )}
-      {showOnlinePreview && onlinePreviewId === 204 && (
-        <PalawaBloomInvitation onClose={() => { setShowOnlinePreview(false); setOnlinePreviewId(null); }} />
-      )}
-      {showOnlinePreview && onlinePreviewId === 205 && (
-        <WhiteFreeInvitation onClose={() => { setShowOnlinePreview(false); setOnlinePreviewId(null); }} />
-      )}
-      {showOnlinePreview && onlinePreviewId === 206 && (
-        <JavaneseV2Invitation onClose={() => { setShowOnlinePreview(false); setOnlinePreviewId(null); }} />
-      )}
+
 
       <MusicPlayer autoPlay />
 
-      {/* Dev-only download button — hidden in production */}
-      {process.env.NODE_ENV === "development" && (
-        <a
-          href="/api/deploy-zip"
-          download="memoraa-deploy.zip"
-          className="fixed bottom-6 right-6 z-50 bg-rose-600 hover:bg-rose-700 text-white px-4 py-2.5 rounded-full shadow-lg text-xs font-medium tracking-wide uppercase flex items-center gap-2 transition-colors"
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M7 10l5 5m0 0l5-5m-5 5V3" />
-          </svg>
-          Download ZIP
-        </a>
-      )}
+      {/* Download button */}
+      <button
+        onClick={async () => {
+          const btn = document.activeElement as HTMLButtonElement;
+          const orig = btn.textContent;
+          btn.textContent = 'Downloading...';
+          btn.style.opacity = '0.7';
+          try {
+            const res = await fetch('/api/deploy-zip');
+            if (!res.ok) throw new Error('HTTP ' + res.status);
+            const blob = await res.blob();
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url; a.download = 'memoraa-deploy.zip';
+            document.body.appendChild(a); a.click();
+            document.body.removeChild(a);
+            setTimeout(() => URL.revokeObjectURL(url), 60000);
+            btn.textContent = '✓ Done!';
+          } catch(e) { btn.textContent = '✗ Failed: ' + e.message; }
+          setTimeout(() => { btn.textContent = orig; btn.style.opacity = '1'; }, 3000);
+        }}
+        className="fixed bottom-6 right-6 z-50 bg-rose-600 hover:bg-rose-700 text-white px-4 py-2.5 rounded-full shadow-lg text-xs font-medium tracking-wide uppercase flex items-center gap-2 transition-colors cursor-pointer"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M7 10l5 5m0 0l5-5m-5 5V3" />
+        </svg>
+        DOWNLOAD ZIP
+      </button>
     </div>
   );
 }

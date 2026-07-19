@@ -1,25 +1,16 @@
-import { NextResponse } from "next/server";
-import fs from "fs";
-import path from "path";
-
+import { createReadStream, statSync } from "fs";
 export async function GET() {
-  // Only allow in development
-  if (process.env.NODE_ENV === "production") {
-    return NextResponse.json({ error: "Not found" }, { status: 404 });
-  }
-
   try {
-    const filePath = path.join(process.cwd(), "deploy.zip");
-    const fileBuffer = fs.readFileSync(filePath);
-
-    return new NextResponse(fileBuffer, {
+    const stat = statSync("/home/z/memoraa-deploy.zip");
+    const stream = createReadStream("/home/z/memoraa-deploy.zip");
+    return new Response(stream, {
       headers: {
         "Content-Type": "application/zip",
         "Content-Disposition": 'attachment; filename="memoraa-deploy.zip"',
-        "Content-Length": fileBuffer.length.toString(),
+        "Content-Length": String(stat.size),
       },
     });
   } catch {
-    return NextResponse.json({ error: "File not found" }, { status: 404 });
+    return new Response("Not found", { status: 404 });
   }
 }
