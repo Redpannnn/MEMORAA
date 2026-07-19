@@ -212,7 +212,7 @@ export default function OnlineInvitation({ onClose }: OnlineInvitationProps) {
         {/* ---------- Section: Blessing (old slide 2) ---------- */}
         <section className="h-screen w-full flex flex-col flex-shrink-0">
           {/* Top 60% — Couple Photo */}
-          <div className="relative h-[60%] w-full flex items-center justify-center bg-white bg-cover bg-center bg-no-repeat" style={{ backgroundImage: "url('/images/bg-mempelai.webp')" }}>
+          <div className="relative h-[60%] w-full flex items-center justify-center bg-white bg-cover bg-center bg-no-repeat" style={{ backgroundImage: "url('/images/bg-mempelai.png')" }}>
             <div className="relative w-[55%] sm:w-[45%] lg:w-[35%] aspect-[4/5] rounded-[30%] overflow-hidden shadow-xl">
               {/* Placeholder for couple photo */}
               <div className="absolute inset-0 bg-[#e8e0d4] flex items-center justify-center">
@@ -255,11 +255,11 @@ export default function OnlineInvitation({ onClose }: OnlineInvitationProps) {
         </section>
 
         {/* ---------- Section: Bride & Groom (slide 3) ---------- */}
-        <section className="relative min-h-screen w-full flex flex-col items-center justify-center px-8 sm:px-12 py-12 bg-white bg-cover bg-center bg-no-repeat" style={{ backgroundImage: "url('/images/bg-mempelai.webp')" }}>
+        <section className="relative min-h-screen w-full flex flex-col items-center justify-center px-8 sm:px-12 py-12 bg-white bg-cover bg-center bg-no-repeat" style={{ backgroundImage: "url('/images/bg-mempelai.png')" }}>
           {/* Ornament behind groom photo — full page width */}
-          <img src="/images/divider.webp" alt="" className="absolute top-[22%] left-0 -translate-y-1/2 w-full h-auto opacity-90 -z-10 pointer-events-none" />
+          <img src="/images/divider.png" alt="" className="absolute top-[22%] left-0 -translate-y-1/2 w-full h-auto opacity-90 -z-10 pointer-events-none" />
           {/* Ornament behind bride photo — full page width */}
-          <img src="/images/divider.webp" alt="" className="absolute top-[62%] left-0 -translate-y-1/2 w-full h-auto opacity-90 -z-10 pointer-events-none" />
+          <img src="/images/divider.png" alt="" className="absolute top-[62%] left-0 -translate-y-1/2 w-full h-auto opacity-90 -z-10 pointer-events-none" />
 
           <div className="relative z-10 flex flex-col items-center">
           {/* The Wedding Of */}
@@ -335,7 +335,7 @@ export default function OnlineInvitation({ onClose }: OnlineInvitationProps) {
         </section>
 
         {/* ---------- Section: Precious Moment + Save The Date (slide 4) ---------- */}
-        <section className="h-screen w-full flex flex-col flex-shrink-0 bg-white bg-cover bg-center bg-no-repeat" style={{ backgroundImage: "url('/images/bg-precious-moment.webp')" }}>
+        <section className="h-screen w-full flex flex-col flex-shrink-0 bg-white bg-cover bg-center bg-no-repeat" style={{ backgroundImage: "url('/images/bg-precious-moment.png')" }}>
           {/* Top 70% — Precious Moment + Photo Grid */}
           <div className="h-[70%] w-full flex flex-col items-center justify-center px-8 sm:px-12">
             {/* Heading — Latin/script font */}
@@ -406,7 +406,7 @@ export default function OnlineInvitation({ onClose }: OnlineInvitationProps) {
         </section>
 
         {/* ---------- Section: Event Details + Hadiah Pernikahan (slide 5) ---------- */}
-        <section className="h-screen w-full flex flex-col flex-shrink-0 bg-white bg-cover bg-center bg-no-repeat" style={{ backgroundImage: "url('/images/bg-precious-moment.webp')" }}>
+        <section className="h-screen w-full flex flex-col flex-shrink-0 bg-white bg-cover bg-center bg-no-repeat" style={{ backgroundImage: "url('/images/bg-precious-moment.png')" }}>
           {/* Top 70% — Event Details */}
           <div className="h-[70%] w-full flex flex-col items-center justify-center px-6 sm:px-10">
             {/* Event cards — side by side on desktop, stacked on mobile */}
@@ -480,7 +480,7 @@ export default function OnlineInvitation({ onClose }: OnlineInvitationProps) {
         </section>
 
         {/* ---------- Section: RSVP / Wishes (slide 6) ---------- */}
-        <section className="min-h-screen w-full flex flex-col bg-white bg-cover bg-center bg-no-repeat" style={{ backgroundImage: "url('/images/bg-precious-moment.webp')" }}>
+        <section className="min-h-screen w-full flex flex-col bg-white bg-cover bg-center bg-no-repeat" style={{ backgroundImage: "url('/images/bg-precious-moment.png')" }}>
           {/* Top — RSVP Form */}
           <div className="w-full flex flex-col items-center px-6 sm:px-10 pt-10 pb-6">
             <h3 className="font-[family-name:var(--font-cormorant)] text-[#57604F] text-2xl sm:text-3xl tracking-[0.3em] uppercase font-semibold mb-2">
