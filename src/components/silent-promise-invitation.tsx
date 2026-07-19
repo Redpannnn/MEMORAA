@@ -49,7 +49,7 @@ export default function SilentPromiseInvitation({ onClose }: SilentPromiseInvita
 
   const loadWishes = useCallback(async () => {
     try {
-      const res = await fetch("/api/wishes");
+      const res = await fetch("/api/wishes?templateId=silent-promise");
       if (res.ok) {
         const data = await res.json();
         setWishes(data);
@@ -78,6 +78,7 @@ export default function SilentPromiseInvitation({ onClose }: SilentPromiseInvita
           name: wishName.trim(),
           attendance: wishAttendance,
           message: wishMessage.trim() || null,
+          templateId: "silent-promise",
         }),
       });
       if (res.ok) {

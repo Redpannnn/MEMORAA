@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono, Great_Vibes, Cormorant_Garamond, Playfair_Display, Lato } from "next/font/google";
+import { Geist, Geist_Mono, Great_Vibes, Cormorant_Garamond, Playfair_Display, Lato, Prata } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/components/ui/toaster";
 
@@ -37,6 +37,12 @@ const lato = Lato({
   weight: ["300", "400", "700"],
 });
 
+const prata = Prata({
+  variable: "--font-prata",
+  subsets: ["latin"],
+  weight: "400",
+});
+
 export const metadata: Metadata = {
   title: "Memoraa' - Template Undangan Pernikahan",
   description: "Koleksi template undangan pernikahan cetak eksklusif. Desain elegan dan premium untuk hari spesial Anda.",
@@ -66,7 +72,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} ${greatVibes.variable} ${cormorant.variable} ${playfair.variable} ${lato.variable} antialiased bg-background text-foreground`}
+        className={`${geistSans.variable} ${geistMono.variable} ${greatVibes.variable} ${cormorant.variable} ${playfair.variable} ${lato.variable} ${prata.variable} antialiased bg-background text-foreground`}
       >
         {children}
         <Toaster />

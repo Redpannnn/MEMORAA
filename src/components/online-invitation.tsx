@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect, useCallback } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Send } from "lucide-react";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
@@ -22,19 +22,19 @@ export default function OnlineInvitation({ onClose }: OnlineInvitationProps) {
   const [submitting, setSubmitting] = useState(false);
   const [submitSuccess, setSubmitSuccess] = useState(false);
 
-  const fetchWishes = useCallback(async () => {
-    try {
-      const res = await fetch("/api/wishes");
-      if (res.ok) {
-        const data = await res.json();
-        setWishes(data);
-      }
-    } catch { /* silent */ }
-  }, []);
-
   useEffect(() => {
-    fetchWishes();
-  }, [fetchWishes]);
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await fetch("/api/wishes?templateId=serene-love");
+        if (res.ok && !cancelled) {
+          const data = await res.json();
+          setWishes(data);
+        }
+      } catch { /* silent */ }
+    })();
+    return () => { cancelled = true; };
+  }, []);
 
   const submitWish = async () => {
     if (!wishName.trim() || submitting) return;
@@ -47,6 +47,7 @@ export default function OnlineInvitation({ onClose }: OnlineInvitationProps) {
           name: wishName.trim(),
           attendance: wishAttendance,
           message: wishMessage.trim() || null,
+          templateId: "serene-love",
         }),
       });
       if (res.ok) {
@@ -54,7 +55,14 @@ export default function OnlineInvitation({ onClose }: OnlineInvitationProps) {
         setWishMessage("");
         setSubmitSuccess(true);
         setTimeout(() => setSubmitSuccess(false), 3000);
-        fetchWishes();
+        // Re-fetch wishes
+        try {
+          const res2 = await fetch("/api/wishes?templateId=serene-love");
+          if (res2.ok) {
+            const data = await res2.json();
+            setWishes(data);
+          }
+        } catch { /* silent */ }
       }
     } catch { /* silent */ }
     setSubmitting(false);
@@ -65,26 +73,25 @@ export default function OnlineInvitation({ onClose }: OnlineInvitationProps) {
   const weddingDate = new Date("2026-12-01T00:00:00+07:00").getTime();
   const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
 
-  const updateCountdown = useCallback(() => {
-    const now = Date.now();
-    const diff = weddingDate - now;
-    if (diff <= 0) {
-      setTimeLeft({ days: 0, hours: 0, minutes: 0, seconds: 0 });
-      return;
-    }
-    setTimeLeft({
-      days: Math.floor(diff / (1000 * 60 * 60 * 24)),
-      hours: Math.floor((diff / (1000 * 60 * 60)) % 24),
-      minutes: Math.floor((diff / (1000 * 60)) % 60),
-      seconds: Math.floor((diff / 1000) % 60),
-    });
-  }, [weddingDate]);
-
   useEffect(() => {
-    updateCountdown();
-    const interval = setInterval(updateCountdown, 1000);
+    const tick = () => {
+      const now = Date.now();
+      const diff = weddingDate - now;
+      if (diff <= 0) {
+        setTimeLeft({ days: 0, hours: 0, minutes: 0, seconds: 0 });
+        return;
+      }
+      setTimeLeft({
+        days: Math.floor(diff / (1000 * 60 * 60 * 24)),
+        hours: Math.floor((diff / (1000 * 60 * 60)) % 24),
+        minutes: Math.floor((diff / (1000 * 60)) % 60),
+        seconds: Math.floor((diff / 1000) % 60),
+      });
+    };
+    tick();
+    const interval = setInterval(tick, 1000);
     return () => clearInterval(interval);
-  }, [updateCountdown]);
+  }, [weddingDate]);
 
   const openInvitation = () => {
     setShowCover(false);
@@ -205,7 +212,7 @@ export default function OnlineInvitation({ onClose }: OnlineInvitationProps) {
         {/* ---------- Section: Blessing (old slide 2) ---------- */}
         <section className="h-screen w-full flex flex-col flex-shrink-0">
           {/* Top 60% — Couple Photo */}
-          <div className="relative h-[60%] w-full flex items-center justify-center bg-[#f5f0eb]">
+          <div className="relative h-[60%] w-full flex items-center justify-center bg-white bg-cover bg-center bg-no-repeat" style={{ backgroundImage: "url('/images/bg-mempelai.webp')" }}>
             <div className="relative w-[55%] sm:w-[45%] lg:w-[35%] aspect-[4/5] rounded-[30%] overflow-hidden shadow-xl">
               {/* Placeholder for couple photo */}
               <div className="absolute inset-0 bg-[#e8e0d4] flex items-center justify-center">
@@ -220,27 +227,27 @@ export default function OnlineInvitation({ onClose }: OnlineInvitationProps) {
           </div>
 
           {/* Bottom 40% — Blessing Text */}
-          <div className="relative h-[40%] w-full flex flex-col items-center justify-center px-8 sm:px-12 bg-white">
+          <div className="relative h-[40%] w-full flex flex-col items-center justify-center px-8 sm:px-12 bg-[#2D4A2B]">
             <div className="text-center max-w-md">
-              <p className="text-[#57604F] text-xs sm:text-sm tracking-[0.25em] uppercase font-light mb-3">
+              <p className="text-[#F5E6C8] text-xs sm:text-sm tracking-[0.25em] uppercase font-light mb-3">
                 Allah&apos;s Blessings
               </p>
 
-              <p className="font-[family-name:var(--font-cormorant)] text-[#57604F] text-lg sm:text-xl lg:text-2xl leading-relaxed mb-4" dir="rtl">
+              <p className="font-[family-name:var(--font-cormorant)] text-[#F5E6C8] text-lg sm:text-xl lg:text-2xl leading-relaxed mb-4" dir="rtl">
                 يَتَفَكَّرُونَ
               </p>
 
               <div className="flex items-center justify-center gap-2 mb-4">
-                <span className="block w-8 h-px bg-[#57604F]/30" />
-                <span className="block w-1.5 h-1.5 rounded-full bg-[#57604F]/40" />
-                <span className="block w-8 h-px bg-[#57604F]/30" />
+                <span className="block w-8 h-px bg-[#F5E6C8]/30" />
+                <span className="block w-1.5 h-1.5 rounded-full bg-[#F5E6C8]/40" />
+                <span className="block w-8 h-px bg-[#F5E6C8]/30" />
               </div>
 
-              <p className="text-[#57604F] text-[10px] sm:text-xs leading-relaxed opacity-80">
+              <p className="text-[#F5E6C8] text-[10px] sm:text-xs leading-relaxed opacity-80">
                 Di antara tanda-tanda (kebesaran)-Nya ialah bahwa Dia menciptakan pasangan-pasangan untukmu dari jenismu sendiri agar kamu merasa tenteram kepadanya. Dia menjadikan di antaramu rasa cinta dan kasih sayang. Sesungguhnya pada yang demikian itu benar-benar terdapat tanda-tanda bagi kaum yang berpikir.
               </p>
 
-              <p className="text-[#57604F] text-[10px] sm:text-xs mt-3 italic opacity-60">
+              <p className="text-[#F5E6C8] text-[10px] sm:text-xs mt-3 italic opacity-60">
                 (QS. Ar-Rum: 21)
               </p>
             </div>
@@ -248,9 +255,15 @@ export default function OnlineInvitation({ onClose }: OnlineInvitationProps) {
         </section>
 
         {/* ---------- Section: Bride & Groom (slide 3) ---------- */}
-        <section className="min-h-screen w-full flex flex-col items-center justify-center px-8 sm:px-12 py-12 bg-[#f5f0eb]">
+        <section className="relative min-h-screen w-full flex flex-col items-center justify-center px-8 sm:px-12 py-12 bg-white bg-cover bg-center bg-no-repeat" style={{ backgroundImage: "url('/images/bg-mempelai.webp')" }}>
+          {/* Ornament behind groom photo — full page width */}
+          <img src="/images/divider.webp" alt="" className="absolute top-[22%] left-0 -translate-y-1/2 w-full h-auto opacity-90 -z-10 pointer-events-none" />
+          {/* Ornament behind bride photo — full page width */}
+          <img src="/images/divider.webp" alt="" className="absolute top-[62%] left-0 -translate-y-1/2 w-full h-auto opacity-90 -z-10 pointer-events-none" />
+
+          <div className="relative z-10 flex flex-col items-center">
           {/* The Wedding Of */}
-          <p className="font-[family-name:var(--font-cormorant)] text-[#57604F] text-sm sm:text-base tracking-[0.35em] uppercase font-light mb-8 sm:mb-10">
+          <p className="font-[family-name:var(--font-cormorant)] text-[#57604F] text-sm sm:text-base tracking-[0.15em] font-medium mb-8 sm:mb-10">
             The Wedding Of
           </p>
 
@@ -268,10 +281,15 @@ export default function OnlineInvitation({ onClose }: OnlineInvitationProps) {
               </div>
             </div>
 
-            {/* Groom name */}
-            <h2 className="font-[family-name:var(--font-great-vibes)] text-[#57604F] text-4xl sm:text-5xl mt-4">
+            {/* Groom nickname */}
+            <h2 className="font-[family-name:var(--font-great-vibes)] text-[#57604F] text-4xl sm:text-5xl mt-4 font-medium">
               Tama
             </h2>
+
+            {/* Groom full name */}
+            <p className="text-[#57604F] text-xs sm:text-sm mt-1 font-medium tracking-wide text-center">
+              Maestro Ade Pratama
+            </p>
 
             {/* Groom parents */}
             <p className="text-[#57604F] text-[10px] sm:text-xs mt-2 tracking-wide opacity-70 text-center">
@@ -298,20 +316,26 @@ export default function OnlineInvitation({ onClose }: OnlineInvitationProps) {
               </div>
             </div>
 
-            {/* Bride name */}
-            <h2 className="font-[family-name:var(--font-great-vibes)] text-[#57604F] text-4xl sm:text-5xl mt-4">
+            {/* Bride nickname */}
+            <h2 className="font-[family-name:var(--font-great-vibes)] text-[#57604F] text-4xl sm:text-5xl mt-4 font-medium">
               Septi
             </h2>
+
+            {/* Bride full name */}
+            <p className="text-[#57604F] text-xs sm:text-sm mt-1 font-medium tracking-wide text-center">
+              Farida Septiani
+            </p>
 
             {/* Bride parents */}
             <p className="text-[#57604F] text-[10px] sm:text-xs mt-2 tracking-wide opacity-70 text-center">
               Putri Bapak Anto &amp; Ibu Eni
             </p>
           </div>
+          </div>
         </section>
 
         {/* ---------- Section: Precious Moment + Save The Date (slide 4) ---------- */}
-        <section className="h-screen w-full flex flex-col flex-shrink-0 bg-white">
+        <section className="h-screen w-full flex flex-col flex-shrink-0 bg-white bg-cover bg-center bg-no-repeat" style={{ backgroundImage: "url('/images/bg-precious-moment.webp')" }}>
           {/* Top 70% — Precious Moment + Photo Grid */}
           <div className="h-[70%] w-full flex flex-col items-center justify-center px-8 sm:px-12">
             {/* Heading — Latin/script font */}
@@ -344,9 +368,9 @@ export default function OnlineInvitation({ onClose }: OnlineInvitationProps) {
           </div>
 
           {/* Bottom 30% — Save The Date + Countdown */}
-          <div className="h-[30%] w-full flex flex-col items-center justify-center px-8 sm:px-12 bg-[#f5f0eb]">
+          <div className="h-[30%] w-full flex flex-col items-center justify-center px-8 sm:px-12 bg-[#2D4A2B]">
             {/* Save The Date heading — Latin/script font */}
-            <p className="font-[family-name:var(--font-great-vibes)] text-[#57604F] text-xl sm:text-2xl lg:text-3xl mb-4 sm:mb-5">
+            <p className="font-[family-name:var(--font-great-vibes)] text-[#F5E6C8] text-xl sm:text-2xl lg:text-3xl mb-4 sm:mb-5">
               Save The Date
             </p>
 
@@ -360,29 +384,29 @@ export default function OnlineInvitation({ onClose }: OnlineInvitationProps) {
               ] as const).map((item, idx) => (
                 <div key={item.label} className="flex items-center gap-2 sm:gap-3">
                   <div className="flex flex-col items-center">
-                    <span className="bg-white text-[#57604F] text-xl sm:text-2xl lg:text-3xl font-light w-12 sm:w-14 lg:w-16 h-12 sm:h-14 lg:h-16 flex items-center justify-center rounded-lg shadow-sm">
+                    <span className="bg-[#F5E6C8]/10 text-[#F5E6C8] text-xl sm:text-2xl lg:text-3xl font-light w-12 sm:w-14 lg:w-16 h-12 sm:h-14 lg:h-16 flex items-center justify-center rounded-lg border border-[#F5E6C8]/20">
                       {String(item.value).padStart(2, "0")}
                     </span>
-                    <span className="text-[#57604F] text-[8px] sm:text-[10px] tracking-wider uppercase mt-1 opacity-60">
+                    <span className="text-[#F5E6C8] text-[8px] sm:text-[10px] tracking-wider uppercase mt-1 opacity-60">
                       {item.label}
                     </span>
                   </div>
                   {idx < 3 && (
-                    <span className="text-[#57604F] text-lg sm:text-xl opacity-30 -mt-4">:</span>
+                    <span className="text-[#F5E6C8] text-lg sm:text-xl opacity-30 -mt-4">:</span>
                   )}
                 </div>
               ))}
             </div>
 
             {/* Event date */}
-            <p className="text-[#57604F] text-[10px] sm:text-xs tracking-[0.15em] font-light">
+            <p className="text-[#F5E6C8] text-[10px] sm:text-xs tracking-[0.15em] font-light">
               Tuesday, 01 December 2026
             </p>
           </div>
         </section>
 
         {/* ---------- Section: Event Details + Hadiah Pernikahan (slide 5) ---------- */}
-        <section className="h-screen w-full flex flex-col flex-shrink-0 bg-white">
+        <section className="h-screen w-full flex flex-col flex-shrink-0 bg-white bg-cover bg-center bg-no-repeat" style={{ backgroundImage: "url('/images/bg-precious-moment.webp')" }}>
           {/* Top 70% — Event Details */}
           <div className="h-[70%] w-full flex flex-col items-center justify-center px-6 sm:px-10">
             {/* Event cards — side by side on desktop, stacked on mobile */}
@@ -426,12 +450,12 @@ export default function OnlineInvitation({ onClose }: OnlineInvitationProps) {
           </div>
 
           {/* Bottom 30% — Hadiah Pernikahan */}
-          <div className="h-[30%] w-full flex flex-col items-center justify-center px-6 sm:px-10 bg-[#f5f0eb]">
-            <h3 className="font-[family-name:var(--font-great-vibes)] text-[#57604F] text-xl sm:text-2xl mb-3">
+          <div className="h-[30%] w-full flex flex-col items-center justify-center px-6 sm:px-10 bg-[#2D4A2B]">
+            <h3 className="font-[family-name:var(--font-great-vibes)] text-[#F5E6C8] text-xl sm:text-2xl mb-3">
               Hadiah Pernikahan
             </h3>
 
-            <p className="text-[#57604F] text-[9px] sm:text-[10px] leading-relaxed opacity-70 text-center max-w-sm mb-4">
+            <p className="text-[#F5E6C8] text-[9px] sm:text-[10px] leading-relaxed opacity-70 text-center max-w-sm mb-4">
               Bagi Bapak/Ibu/Saudara/i yang ingin mengirimkan hadiah pernikahan dapat melalui virtual account atau e-wallet di bawah ini:
             </p>
 
@@ -439,24 +463,24 @@ export default function OnlineInvitation({ onClose }: OnlineInvitationProps) {
             {!showGift ? (
               <button
                 onClick={() => setShowGift(true)}
-                className="bg-white text-[#57604F] px-5 py-1.5 text-[10px] sm:text-xs tracking-[0.15em] uppercase font-medium rounded-full hover:bg-white/90 transition-all duration-300 shadow-sm"
+                className="bg-[#F5E6C8] text-[#2D4A2B] px-5 py-1.5 text-[10px] sm:text-xs tracking-[0.15em] uppercase font-medium rounded-full hover:bg-[#F5E6C8]/90 transition-all duration-300 shadow-sm"
               >
                 Kirim Hadiah
               </button>
             ) : (
-              <div className="bg-white rounded-lg px-5 py-3 shadow-sm text-center">
-                <p className="text-[#57604F] text-[9px] sm:text-[10px] opacity-60 mb-1">Bank BCA</p>
-                <p className="text-[#57604F] text-sm sm:text-base font-medium tracking-wider select-all">
+              <div className="bg-[#F5E6C8]/10 rounded-lg px-5 py-3 border border-[#F5E6C8]/20 text-center">
+                <p className="text-[#F5E6C8] text-[9px] sm:text-[10px] opacity-60 mb-1">Bank BCA</p>
+                <p className="text-[#F5E6C8] text-sm sm:text-base font-medium tracking-wider select-all">
                   1234 5678 90
                 </p>
-                <p className="text-[#57604F] text-[9px] sm:text-[10px] opacity-60 mt-1">a.n. Tama &amp; Septi</p>
+                <p className="text-[#F5E6C8] text-[9px] sm:text-[10px] opacity-60 mt-1">a.n. Tama &amp; Septi</p>
               </div>
             )}
           </div>
         </section>
 
         {/* ---------- Section: RSVP / Wishes (slide 6) ---------- */}
-        <section className="min-h-screen w-full flex flex-col bg-white">
+        <section className="min-h-screen w-full flex flex-col bg-white bg-cover bg-center bg-no-repeat" style={{ backgroundImage: "url('/images/bg-precious-moment.webp')" }}>
           {/* Top — RSVP Form */}
           <div className="w-full flex flex-col items-center px-6 sm:px-10 pt-10 pb-6">
             <h3 className="font-[family-name:var(--font-cormorant)] text-[#57604F] text-2xl sm:text-3xl tracking-[0.3em] uppercase font-semibold mb-2">

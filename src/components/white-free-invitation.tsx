@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect, useCallback } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Send, MapPin, Calendar, Clock, ArrowRight, Heart } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X } from "lucide-react";
@@ -42,17 +42,19 @@ export default function WhiteFreeInvitation({ onClose }: WhiteFreeInvitationProp
   const [submitting, setSubmitting] = useState(false);
   const [submitSuccess, setSubmitSuccess] = useState(false);
 
-  const fetchWishes = useCallback(async () => {
-    try {
-      const res = await fetch("/api/wishes");
-      if (res.ok) {
-        const data = await res.json();
-        setWishes(data);
-      }
-    } catch { /* silent */ }
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await fetch("/api/wishes?templateId=white-free");
+        if (res.ok && !cancelled) {
+          const data = await res.json();
+          setWishes(data);
+        }
+      } catch { /* silent */ }
+    })();
+    return () => { cancelled = true; };
   }, []);
-
-  useEffect(() => { fetchWishes(); }, [fetchWishes]);
 
   const submitWish = async () => {
     if (!wishName.trim() || submitting) return;
@@ -65,6 +67,7 @@ export default function WhiteFreeInvitation({ onClose }: WhiteFreeInvitationProp
           name: wishName.trim(),
           attendance: wishAttendance,
           message: wishMessage.trim() || null,
+          templateId: "white-free",
         }),
       });
       if (res.ok) {
@@ -72,7 +75,14 @@ export default function WhiteFreeInvitation({ onClose }: WhiteFreeInvitationProp
         setWishMessage("");
         setSubmitSuccess(true);
         setTimeout(() => setSubmitSuccess(false), 3000);
-        fetchWishes();
+        // Re-fetch wishes
+        try {
+          const res2 = await fetch("/api/wishes?templateId=white-free");
+          if (res2.ok) {
+            const data = await res2.json();
+            setWishes(data);
+          }
+        } catch { /* silent */ }
       }
     } catch { /* silent */ }
     setSubmitting(false);
@@ -82,26 +92,26 @@ export default function WhiteFreeInvitation({ onClose }: WhiteFreeInvitationProp
   const weddingDate = new Date("2026-11-02T00:00:00+07:00").getTime();
   const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
 
-  const updateCountdown = useCallback(() => {
-    const now = Date.now();
-    const diff = weddingDate - now;
-    if (diff <= 0) {
-      setTimeLeft({ days: 0, hours: 0, minutes: 0, seconds: 0 });
-      return;
-    }
-    setTimeLeft({
-      days: Math.floor(diff / (1000 * 60 * 60 * 24)),
-      hours: Math.floor((diff / (1000 * 60 * 60)) % 24),
-      minutes: Math.floor((diff / (1000 * 60)) % 60),
-      seconds: Math.floor((diff / 1000) % 60),
-    });
+  useEffect(() => {
+    const tick = () => {
+      const now = Date.now();
+      const diff = weddingDate - now;
+      if (diff <= 0) {
+        setTimeLeft({ days: 0, hours: 0, minutes: 0, seconds: 0 });
+        return;
+      }
+      setTimeLeft({
+        days: Math.floor(diff / (1000 * 60 * 60 * 24)),
+        hours: Math.floor((diff / (1000 * 60 * 60)) % 24),
+        minutes: Math.floor((diff / (1000 * 60)) % 60),
+        seconds: Math.floor((diff / 1000) % 60),
+      });
+    };
+    tick();
+    const interval = setInterval(tick, 1000);
+    return () => clearInterval(interval);
   }, [weddingDate]);
 
-  useEffect(() => {
-    updateCountdown();
-    const interval = setInterval(updateCountdown, 1000);
-    return () => clearInterval(interval);
-  }, [updateCountdown]);
 
   return (
     <div className="fixed inset-0 z-50">

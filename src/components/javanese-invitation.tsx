@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect, useCallback } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Send, X } from "lucide-react";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
@@ -21,19 +21,19 @@ export default function JavaneseInvitation({ onClose }: JavaneseInvitationProps)
   const [submitting, setSubmitting] = useState(false);
   const [submitSuccess, setSubmitSuccess] = useState(false);
 
-  const fetchWishes = useCallback(async () => {
-    try {
-      const res = await fetch("/api/wishes");
-      if (res.ok) {
-        const data = await res.json();
-        setWishes(data);
-      }
-    } catch { /* silent */ }
-  }, []);
-
   useEffect(() => {
-    fetchWishes();
-  }, [fetchWishes]);
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await fetch("/api/wishes?templateId=javanese");
+        if (res.ok && !cancelled) {
+          const data = await res.json();
+          setWishes(data);
+        }
+      } catch { /* silent */ }
+    })();
+    return () => { cancelled = true; };
+  }, []);
 
   const submitWish = async () => {
     if (!wishName.trim() || submitting) return;
@@ -46,6 +46,7 @@ export default function JavaneseInvitation({ onClose }: JavaneseInvitationProps)
           name: wishName.trim(),
           attendance: wishAttendance,
           message: wishMessage.trim() || null,
+          templateId: "javanese",
         }),
       });
       if (res.ok) {
@@ -53,7 +54,14 @@ export default function JavaneseInvitation({ onClose }: JavaneseInvitationProps)
         setWishMessage("");
         setSubmitSuccess(true);
         setTimeout(() => setSubmitSuccess(false), 3000);
-        fetchWishes();
+        // Re-fetch wishes
+        try {
+          const res2 = await fetch("/api/wishes?templateId=javanese");
+          if (res2.ok) {
+            const data = await res2.json();
+            setWishes(data);
+          }
+        } catch { /* silent */ }
       }
     } catch { /* silent */ }
     setSubmitting(false);
@@ -64,26 +72,25 @@ export default function JavaneseInvitation({ onClose }: JavaneseInvitationProps)
   const weddingDate = new Date("2026-12-31T00:00:00+07:00").getTime();
   const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
 
-  const updateCountdown = useCallback(() => {
-    const now = Date.now();
-    const diff = weddingDate - now;
-    if (diff <= 0) {
-      setTimeLeft({ days: 0, hours: 0, minutes: 0, seconds: 0 });
-      return;
-    }
-    setTimeLeft({
-      days: Math.floor(diff / (1000 * 60 * 60 * 24)),
-      hours: Math.floor((diff / (1000 * 60 * 60)) % 24),
-      minutes: Math.floor((diff / (1000 * 60)) % 60),
-      seconds: Math.floor((diff / 1000) % 60),
-    });
-  }, [weddingDate]);
-
   useEffect(() => {
-    updateCountdown();
-    const interval = setInterval(updateCountdown, 1000);
+    const tick = () => {
+      const now = Date.now();
+      const diff = weddingDate - now;
+      if (diff <= 0) {
+        setTimeLeft({ days: 0, hours: 0, minutes: 0, seconds: 0 });
+        return;
+      }
+      setTimeLeft({
+        days: Math.floor(diff / (1000 * 60 * 60 * 24)),
+        hours: Math.floor((diff / (1000 * 60 * 60)) % 24),
+        minutes: Math.floor((diff / (1000 * 60)) % 60),
+        seconds: Math.floor((diff / 1000) % 60),
+      });
+    };
+    tick();
+    const interval = setInterval(tick, 1000);
     return () => clearInterval(interval);
-  }, [updateCountdown]);
+  }, [weddingDate]);
 
   const openInvitation = () => {
     setShowCover(false);
@@ -120,46 +127,6 @@ export default function JavaneseInvitation({ onClose }: JavaneseInvitationProps)
             />
             {/* Dark overlay */}
             <div className="absolute inset-0 bg-black/50" />
-
-            {/* Top-left gold ornament */}
-            <motion.div
-              initial={{ opacity: 0, x: -30 }}
-              animate={{ opacity: 1, x: 0, rotate: [0, 2, -2, 0] }}
-              transition={{
-                opacity: { delay: 0.5, duration: 0.8 },
-                x: { delay: 0.5, duration: 0.8 },
-                rotate: { delay: 1.5, duration: 4, repeat: Infinity, ease: "easeInOut" },
-              }}
-              className="absolute top-0 left-0 w-[80px] sm:w-[100px] lg:w-[120px] h-auto z-10 pointer-events-none"
-            >
-              <Image
-                src="/invitations/online/javanese/ornamen-emas.png"
-                alt=""
-                width={1024}
-                height={1024}
-                className="w-full h-auto object-contain"
-              />
-            </motion.div>
-
-            {/* Top-right gold ornament */}
-            <motion.div
-              initial={{ opacity: 0, x: 30 }}
-              animate={{ opacity: 1, x: 0, rotate: [0, -2, 2, 0] }}
-              transition={{
-                opacity: { delay: 0.5, duration: 0.8 },
-                x: { delay: 0.5, duration: 0.8 },
-                rotate: { delay: 1.8, duration: 4, repeat: Infinity, ease: "easeInOut" },
-              }}
-              className="absolute top-0 right-0 w-[80px] sm:w-[100px] lg:w-[120px] h-auto z-10 pointer-events-none"
-            >
-              <Image
-                src="/invitations/online/javanese/ornamen-emas.png"
-                alt=""
-                width={1024}
-                height={1024}
-                className="w-full h-auto object-contain"
-              />
-            </motion.div>
 
             {/* Cover Content */}
             <div

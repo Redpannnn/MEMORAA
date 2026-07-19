@@ -32,9 +32,10 @@ model Post {
 }
 
 model Wish {
-  id        String   @id @default(cuid())
-  name      String
-  attendance String
-  message   String?
-  createdAt DateTime @default(now())
+  id         String   @id @default(cuid())
+  templateId String?
+  name       String
+  attendance  String
+  message    String?
+  createdAt  DateTime @default(now())
 }

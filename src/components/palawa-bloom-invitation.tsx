@@ -81,7 +81,7 @@ export default function PalawaBloomInvitation({ onClose }: PalawaBloomInvitation
 
   const loadWishes = useCallback(async () => {
     try {
-      const res = await fetch("/api/wishes");
+      const res = await fetch("/api/wishes?templateId=palawa-bloom");
       if (res.ok) {
         const data = await res.json();
         setWishes(data);
@@ -112,6 +112,7 @@ export default function PalawaBloomInvitation({ onClose }: PalawaBloomInvitation
           name: wishName.trim(),
           attendance: wishAttendance,
           message: wishMessage.trim() || null,
+          templateId: "palawa-bloom",
         }),
       });
       if (res.ok) {
@@ -239,35 +240,36 @@ export default function PalawaBloomInvitation({ onClose }: PalawaBloomInvitation
             <section className="relative min-h-screen flex flex-col items-center justify-center py-16 px-6 overflow-hidden"
               style={{ backgroundColor: "#F0F0F0" }}
             >
-              {/* Subtle wallpaper pattern */}
-              <div className="absolute inset-0 opacity-[0.06] pointer-events-none">
+              <div className="absolute inset-0 pointer-events-none">
                 <Image
-                  src="/invitations/online/palawa-bloom/wallpaper.png"
+                  src="/invitations/online/palawa-bloom/bg-groom.png"
                   alt=""
                   fill
                   className="object-cover"
                 />
               </div>
 
-              <div className="relative z-10 flex flex-col items-center">
-                {/* Arch frame decorative border */}
+              <div className="relative z-10">
+                {/* Arch frame */}
                 <motion.div
                   initial="hidden"
                   whileInView="visible"
                   viewport={{ once: true, margin: "-50px" }}
                   custom={0}
                   variants={fadeUp}
-                  className="relative w-64 h-[420px] sm:w-72 sm:h-[460px] mb-8"
+                  className="relative w-64 h-[420px] sm:w-72 sm:h-[460px] mx-auto"
                 >
                   {/* Arch frame border */}
-                  <Image
-                    src="/invitations/online/palawa-bloom/arch-frame.png"
-                    alt=""
-                    fill
-                    className="object-contain"
-                  />
+                  <div className="absolute inset-0 overflow-hidden rounded-t-full rounded-b-[2rem]">
+                    <Image
+                      src="/invitations/online/palawa-bloom/arch-frame.png"
+                      alt=""
+                      fill
+                      className="object-cover"
+                    />
+                  </div>
                   {/* Couple photo clipped inside */}
-                  <div className="absolute inset-[8%] overflow-hidden rounded-t-full rounded-b-[2rem]">
+                  <div className="absolute inset-[3%] overflow-hidden rounded-t-full rounded-b-[2rem]">
                     <Image
                       src="/invitations/online/palawa-bloom/couple-cover.png"
                       alt="Wisnu & Via"
@@ -277,27 +279,50 @@ export default function PalawaBloomInvitation({ onClose }: PalawaBloomInvitation
                   </div>
                 </motion.div>
 
-                <motion.p
-                  initial="hidden"
-                  whileInView="visible"
-                  viewport={{ once: true, margin: "-50px" }}
-                  custom={1}
-                  variants={fadeUp}
-                  className="text-xs tracking-[0.2em] uppercase text-[#666666] mb-2"
-                >
-                  The Wedding of
-                </motion.p>
-                <motion.h2
-                  initial="hidden"
-                  whileInView="visible"
-                  viewport={{ once: true, margin: "-50px" }}
-                  custom={2}
-                  variants={fadeUp}
-                  className="text-2xl sm:text-3xl text-black"
-                  style={{ fontFamily: "var(--font-playfair), serif", fontWeight: 700 }}
-                >
-                  Wisnu &amp; Via
-                </motion.h2>
+                {/* Bottom area: flower left, text right */}
+                <div className="flex items-end justify-between mt-2 px-2 sm:px-0">
+                  {/* Flower bouquet bottom-left */}
+                  <motion.div
+                    initial="hidden"
+                    whileInView="visible"
+                    viewport={{ once: true, margin: "-50px" }}
+                    custom={1}
+                    variants={fadeUp}
+                    className="relative w-36 h-36 sm:w-44 sm:h-44 -mt-8 -ml-2 sm:-ml-4 flex-shrink-0"
+                  >
+                    <Image
+                      src="/invitations/online/palawa-bloom/bouquet-corner.png"
+                      alt=""
+                      fill
+                      className="object-contain mix-blend-multiply"
+                    />
+                  </motion.div>
+
+                  {/* Text bottom-right */}
+                  <div className="text-right flex-shrink-0 pb-2">
+                    <motion.p
+                      initial="hidden"
+                      whileInView="visible"
+                      viewport={{ once: true, margin: "-50px" }}
+                      custom={2}
+                      variants={fadeUp}
+                      className="text-xs tracking-[0.2em] uppercase text-[#666666] mb-1"
+                    >
+                      The Wedding of
+                    </motion.p>
+                    <motion.h2
+                      initial="hidden"
+                      whileInView="visible"
+                      viewport={{ once: true, margin: "-50px" }}
+                      custom={3}
+                      variants={fadeUp}
+                      className="text-2xl sm:text-3xl text-black"
+                      style={{ fontFamily: "var(--font-playfair), serif", fontWeight: 700 }}
+                    >
+                      Wisnu &amp; Via
+                    </motion.h2>
+                  </div>
+                </div>
               </div>
             </section>
 
