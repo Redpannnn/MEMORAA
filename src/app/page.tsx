@@ -28,7 +28,6 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { useToast } from "@/hooks/use-toast";
 import MusicPlayer from "@/components/music-player";
 import {
   Dialog,
@@ -54,7 +53,7 @@ export default function HomePage() {
   const [selectedTemplate, setSelectedTemplate] = useState<Template | null>(null);
   const [selectedPageIndex, setSelectedPageIndex] = useState(0);
   const [currentIndex, setCurrentIndex] = useState(0);
-  const { toast } = useToast();
+  const [showComingSoon, setShowComingSoon] = useState(false);
 
   const [showShowcase, setShowShowcase] = useState(false);
   const [showCaraPemesanan, setShowCaraPemesanan] = useState(false);
@@ -97,10 +96,7 @@ export default function HomePage() {
 
   const toggleGrid = (type: TemplateType) => {
     if (type === "online") {
-      toast({
-        title: "Coming Soon 🔜",
-        description: "Koleksi undangan digital sedang dalam pengerjaan. Nantikan ya!",
-      });
+      setShowComingSoon(true);
       return;
     }
     if (showGrid && templateType === type) {
@@ -1293,11 +1289,32 @@ export default function HomePage() {
         </DialogContent>
       </Dialog>
 
-
+      {/* Coming Soon Dialog */}
+      <Dialog open={showComingSoon} onOpenChange={setShowComingSoon}>
+        <DialogContent className="max-w-sm sm:max-w-md p-0 overflow-hidden">
+          <VisuallyHidden><DialogTitle>Coming Soon</DialogTitle></VisuallyHidden>
+          <div className="relative bg-gradient-to-br from-stone-900 via-stone-800 to-stone-950 text-white px-8 py-10 sm:py-14 text-center">
+            <div className="mx-auto w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-white/10 backdrop-blur-sm flex items-center justify-center mb-6">
+              <Globe className="w-10 h-10 sm:w-12 sm:h-12 text-white/90" />
+            </div>
+            <h2 className="text-3xl sm:text-4xl font-bold tracking-tight">Coming Soon</h2>
+            <p className="mt-3 text-stone-300 text-sm sm:text-base leading-relaxed max-w-xs mx-auto">
+              Koleksi undangan digital sedang dalam pengerjaan. Nantikan ya!
+            </p>
+            <Button
+              onClick={() => setShowComingSoon(false)}
+              className="mt-8 bg-white text-stone-900 hover:bg-stone-100 rounded-full px-8 h-11 text-sm font-semibold"
+            >
+              Oke, Mengerti
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
 
       <MusicPlayer autoPlay />
 
-      {/* Download button */}
+      {/* Download button — dev only */}
+      {process.env.NODE_ENV === "development" && (
       <button
         onClick={async () => {
           const btn = document.activeElement as HTMLButtonElement;
@@ -1325,6 +1342,7 @@ export default function HomePage() {
         </svg>
         DOWNLOAD ZIP
       </button>
+      )}
     </div>
   );
 }
