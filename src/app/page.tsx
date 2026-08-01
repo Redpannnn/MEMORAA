@@ -97,8 +97,7 @@ export default function HomePage() {
     if (type === "online") {
         const toggleGrid = (type: TemplateType) => {
     if (type === "online") {
--     window.open("https://onlineinvt.vercel.app/", "_blank");
-+     window.location.href = "https://onlineinvt.vercel.app/";
+      window.location.href = "https://onlineinvt.vercel.app/";
       return;
     }
       return;
