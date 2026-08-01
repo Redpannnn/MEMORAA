@@ -95,7 +95,12 @@ export default function HomePage() {
 
   const toggleGrid = (type: TemplateType) => {
     if (type === "online") {
-      window.open("https://onlineinvt.vercel.app/", "_blank");
+        const toggleGrid = (type: TemplateType) => {
+    if (type === "online") {
+-     window.open("https://onlineinvt.vercel.app/", "_blank");
++     window.location.href = "https://onlineinvt.vercel.app/";
+      return;
+    }
       return;
     }
     if (showGrid && templateType === type) {
