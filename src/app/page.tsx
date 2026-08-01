@@ -53,6 +53,7 @@ export default function HomePage() {
   const [selectedTemplate, setSelectedTemplate] = useState<Template | null>(null);
   const [selectedPageIndex, setSelectedPageIndex] = useState(0);
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [showComingSoon, setShowComingSoon] = useState(false);
 
   const [showShowcase, setShowShowcase] = useState(false);
   const [showCaraPemesanan, setShowCaraPemesanan] = useState(false);
@@ -95,15 +96,7 @@ export default function HomePage() {
 
   const toggleGrid = (type: TemplateType) => {
     if (type === "online") {
-<<<<<<< HEAD
       window.open("https://onlineinvt.vercel.app/", "_blank");
-=======
-        const toggleGrid = (type: TemplateType) => {
-    if (type === "online") {
-      window.location.href = "https://onlineinvt.vercel.app/";
-      return;
-    }
->>>>>>> 60feecf8061e64f2856cddcb6a41309b9e0ad1b7
       return;
     }
     if (showGrid && templateType === type) {
