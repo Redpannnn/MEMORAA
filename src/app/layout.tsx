@@ -49,7 +49,7 @@ export const metadata: Metadata = {
   keywords: ["undangan pernikahan", "template undangan", "wedding invitation", "undangan cetak", "kartu pernikahan"],
   authors: [{ name: "Memoraa'" }],
   icons: {
-    icon: "/favicon.png",
+    icon: "/ring.png",
   },
   openGraph: {
     title: "Memoraa' - Template Undangan Pernikahan",
