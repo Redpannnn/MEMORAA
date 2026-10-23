@@ -96,7 +96,7 @@ export default function HomePage() {
 
   const toggleGrid = (type: TemplateType) => {
     if (type === "online") {
-      window.open("https://onlineinvt.vercel.app/", "_blank");
+      window.open("https://template.memoraa-invitation.my.id/", "_blank");
       return;
     }
     if (showGrid && templateType === type) {
